@@ -1,0 +1,28 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.6.2/schema.json",
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"nursery": {
+				"useSortedClasses": {
+					"level": "warn",
+					"options": {
+						"attributes": ["classList"],
+						"functions": ["clsx", "cva", "tw"]
+					}
+				}
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"indentStyle": "space",
+			"indentWidth": 2,
+			"trailingComma": "es5"
+		}
+	}
+}
