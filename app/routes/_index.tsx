@@ -21,7 +21,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
   const user = session?.user;
 
-  if (user) return redirect("/dashboard");
+  // if (user) return redirect("/dashboard");
   return null;
 }
 

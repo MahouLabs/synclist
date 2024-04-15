@@ -1,4 +1,11 @@
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   InputOTP,
@@ -8,7 +15,7 @@ import {
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { type LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, useLoaderData, useNavigate } from "@remix-run/react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -52,41 +59,61 @@ export default function Signin() {
   };
 
   return (
-    <div className="-translate-x-1/2 -translate-y-1/2 fixed top-1/2 left-1/2 mx-auto flex w-full max-w-[354px] flex-col gap-4">
-      {mode === "email" && (
-        <form onSubmit={signin}>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            type="email"
-            id="email"
-            placeholder="you@domain.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Button className="mt-2 w-full" type="submit" disabled={loading}>
-            {loading ? "Sending..." : "Send OTP code"}
-          </Button>
-        </form>
-      )}
+    <div className="flex h-screen w-full items-center justify-center px-4">
+      <Card className="mx-auto max-w-[330px]">
+        <CardHeader>
+          <CardTitle className="text-2xl">Signin</CardTitle>
+          <CardDescription>
+            {mode === "email" &&
+              "Enter your email below to signin to your account"}
+            {mode === "otp" && "Enter the OTP code below to finish signing in"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {mode === "email" && (
+            <form onSubmit={signin} className="flex flex-col gap-4">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="you@domain.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button type="submit" disabled={loading}>
+                {loading ? "Sending..." : "Send magic link"}
+              </Button>
+            </form>
+          )}
 
-      {mode === "otp" && (
-        <>
-          <h2>Input your OTP code here</h2>
-          <InputOTP maxLength={6} onComplete={verifyOtp}>
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-            </InputOTPGroup>
-            <InputOTPSeparator />
-            <InputOTPGroup>
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
-        </>
-      )}
+          {mode === "otp" && (
+            <div className="flex flex-col gap-4">
+              <Label>OTP Code</Label>
+              <div className="flex items-center">
+                <InputOTP maxLength={6} onComplete={verifyOtp}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+              <Button type="submit" disabled={loading}>
+                Submit
+              </Button>
+            </div>
+          )}
+          {/* <Button variant="outline" className="w-full">
+              Login with Google
+            </Button> */}
+        </CardContent>
+      </Card>
     </div>
   );
 }
