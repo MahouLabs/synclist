@@ -1,4 +1,17 @@
-import { Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users } from "lucide-react";
+import {
+  Bell,
+  CircleUser,
+  CookingPot,
+  Home,
+  LineChart,
+  Menu,
+  Package,
+  Package2,
+  ScrollText,
+  Search,
+  ShoppingCart,
+  Users,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,22 +26,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/utils/cn";
-import { Link, Outlet, useLocation } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { Link, Outlet, json, useLoaderData, useLocation } from "@remix-run/react";
+import { createBrowserClient } from "@supabase/ssr";
+
+// export function loader({ context }: LoaderFunctionArgs) {
+//   const env = {
+//     SUPABASE_URL: context.cloudflare.env.SUPABASE_URL,
+//     SUPABASE_KEY: context.cloudflare.env.SUPABASE_KEY,
+//   };
+
+//   return json({ env }, { headers: { "Cache-Control": "public, max-age=3600" } });
+// }
+
+const pathTitles = {
+  "/home": "Home",
+  "/groceries": "Groceries",
+  "/cookbook": "Cookbook",
+} as const;
 
 export default function AppLayout() {
   const { pathname } = useLocation();
-
-  console.log(pathname);
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr] md:grid-cols-[220px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link to="/" className="flex items-center gap-2 font-semibold">
-              <Package2 className="h-6 w-6" />
-              <span className="">Acme Inc</span>
-            </Link>
+            <div className="flex items-center gap-2 font-semibold">
+              <ScrollText className="h-6 w-6" />
+              <span className="">SyncList</span>
+            </div>
+            {/* TODO: add theme switcher here */}
             <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
               <Bell className="h-4 w-4" />
               <span className="sr-only">Toggle notifications</span>
@@ -69,23 +98,24 @@ export default function AppLayout() {
                   }
                 )}
               >
-                <Package className="h-4 w-4" />
+                <CookingPot className="h-4 w-4" />
                 Cookbook
               </Link>
             </nav>
           </div>
           <div className="mt-auto p-4">
-            <Card x-chunk="dashboard-02-chunk-0">
-              <CardHeader className="p-2 pt-0 md:p-4">
-                <CardTitle>Upgrade to Pro</CardTitle>
-                <CardDescription>Unlock all features and get unlimited access to our support team.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                <Button size="sm" className="w-full">
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
+            <p>user card here</p>
+            {/* <Card>
+                  <CardHeader>
+                    <CardTitle>Upgrade to Pro</CardTitle>
+                    <CardDescription>Unlock all features and get unlimited access to our support team.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button size="sm" className="w-full">
+                      Upgrade
+                    </Button>
+                  </CardContent>
+                </Card> */}
           </div>
         </div>
       </div>
@@ -100,48 +130,44 @@ export default function AppLayout() {
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
               <nav className="grid gap-2 font-medium text-lg">
-                <Link to="#" className="flex items-center gap-2 font-semibold text-lg">
-                  <Package2 className="h-6 w-6" />
-                  <span className="sr-only">Acme Inc</span>
-                </Link>
+                <div className="mb-4 flex items-center gap-2 font-semibold text-lg">
+                  <ScrollText className="h-6 w-6" />
+                  <span>SyncList</span>
+                </div>
                 <Link
-                  to="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                  to="/home"
+                  className={cn(
+                    "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
+                    { "bg-muted text-foregroud": pathname === "/home" }
+                  )}
                 >
                   <Home className="h-5 w-5" />
-                  Dashboard
+                  Home
                 </Link>
                 <Link
-                  to="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
+                  to="/groceries"
+                  className={cn(
+                    "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
+                    { "bg-muted text-foregroud": pathname === "/groceries" }
+                  )}
                 >
                   <ShoppingCart className="h-5 w-5" />
-                  Orders
+                  Groceries
                 </Link>
                 <Link
-                  to="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                  to="/cookbook"
+                  className={cn(
+                    "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
+                    { "bg-muted text-foregroud": pathname === "/cookbook" }
+                  )}
                 >
-                  <Package className="h-5 w-5" />
-                  Products
-                </Link>
-                <Link
-                  to="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  <Users className="h-5 w-5" />
-                  Customers
-                </Link>
-                <Link
-                  to="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  <LineChart className="h-5 w-5" />
-                  Analytics
+                  <CookingPot className="h-5 w-5" />
+                  Cookbook
                 </Link>
               </nav>
               <div className="mt-auto">
-                <Card>
+                <p>user card here</p>
+                {/* <Card>
                   <CardHeader>
                     <CardTitle>Upgrade to Pro</CardTitle>
                     <CardDescription>Unlock all features and get unlimited access to our support team.</CardDescription>
@@ -151,11 +177,12 @@ export default function AppLayout() {
                       Upgrade
                     </Button>
                   </CardContent>
-                </Card>
+                </Card> */}
               </div>
             </SheetContent>
           </Sheet>
-          <div className="w-full flex-1">
+          <h3>{pathTitles[pathname as keyof typeof pathTitles]}</h3>
+          {/* <div className="w-full flex-1">
             <form>
               <div className="relative">
                 <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
@@ -166,8 +193,8 @@ export default function AppLayout() {
                 />
               </div>
             </form>
-          </div>
-          <DropdownMenu>
+          </div> */}
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="rounded-full">
                 <CircleUser className="h-5 w-5" />
@@ -182,7 +209,7 @@ export default function AppLayout() {
               <DropdownMenuSeparator />
               <DropdownMenuItem>Logout</DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           <Outlet />
