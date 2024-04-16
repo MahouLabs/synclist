@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase.server";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
-import { Link, redirect } from "@remix-run/react";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [

@@ -1,5 +1,7 @@
 import { customAlphabet } from "nanoid";
-export const nanoid = customAlphabet("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+export const nanoid = customAlphabet(
+  "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+);
 
 const prefixes = {
   home: "home",
@@ -7,4 +9,5 @@ const prefixes = {
   recipe: "recp",
 } as const;
 
-export const createId = (prefix: keyof typeof prefixes) => [prefixes[prefix], nanoid(20)].join("_");
+export const createId = (prefix: keyof typeof prefixes) =>
+  [prefixes[prefix], nanoid(20)].join("_");

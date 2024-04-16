@@ -7,6 +7,9 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "correctness": {
+        "noUnusedImports": "error"
+      },
       "nursery": {
         "useSortedClasses": {
           "level": "warn",
@@ -18,13 +21,18 @@
       }
     }
   },
-
+  "json": {
+    "formatter": {
+      "indentStyle": "space",
+      "indentWidth": 2
+    }
+  },
   "javascript": {
     "formatter": {
       "indentStyle": "space",
       "indentWidth": 2,
       "trailingComma": "es5",
-      "lineWidth": 120
+      "lineWidth": 90
     }
   }
 }
