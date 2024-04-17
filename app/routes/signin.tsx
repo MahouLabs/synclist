@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { type LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -64,8 +64,7 @@ export default function Signin() {
         <CardHeader>
           <CardTitle className="text-2xl">Signin</CardTitle>
           <CardDescription>
-            {mode === "email" &&
-              "Enter your email below to signin to your account"}
+            {mode === "email" && "Enter your email below to signin to your account"}
             {mode === "otp" && "Enter the OTP code below to finish signing in"}
           </CardDescription>
         </CardHeader>
