@@ -28,7 +28,7 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                 {
-                  "bg-muted text-primary": pathname === "/home",
+                  "bg-muted text-primary": pathname.includes("/home"),
                 }
               )}
             >
@@ -41,7 +41,7 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                 {
-                  "bg-muted text-primary": pathname === "/groceries",
+                  "bg-muted text-primary": pathname.includes("/groceries"),
                 }
               )}
             >
@@ -54,7 +54,7 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                 {
-                  "bg-muted text-primary": pathname === "/cookbook",
+                  "bg-muted text-primary": pathname.includes("/cookbook"),
                 }
               )}
             >

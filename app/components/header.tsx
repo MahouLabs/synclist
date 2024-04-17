@@ -7,6 +7,8 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 export function Header() {
   const { pathname } = useLocation();
+  const paths = Object.keys(pathTitles);
+  const matchedPath = paths.find((path) => pathname.includes(path));
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -27,7 +29,7 @@ export function Header() {
               to="/home"
               className={cn(
                 "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-                { "bg-muted text-foregroud": pathname === "/home" }
+                { "bg-muted text-foregroud": pathname.includes("/home") }
               )}
             >
               <Home className="h-5 w-5" />
@@ -37,7 +39,7 @@ export function Header() {
               to="/groceries"
               className={cn(
                 "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-                { "bg-muted text-foregroud": pathname === "/groceries" }
+                { "bg-muted text-foregroud": pathname.includes("/groceries") }
               )}
             >
               <ShoppingCart className="h-5 w-5" />
@@ -47,7 +49,7 @@ export function Header() {
               to="/cookbook"
               className={cn(
                 "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-                { "bg-muted text-foregroud": pathname === "/cookbook" }
+                { "bg-muted text-foregroud": pathname.includes("/cookbook") }
               )}
             >
               <CookingPot className="h-5 w-5" />
@@ -70,7 +72,7 @@ export function Header() {
           </div>
         </SheetContent>
       </Sheet>
-      <h3>{pathTitles[pathname as keyof typeof pathTitles]}</h3>
+      <h3>{pathTitles[matchedPath as keyof typeof pathTitles]}</h3>
       {/* <div className="w-full flex-1">
   <form>
     <div className="relative">
