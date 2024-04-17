@@ -25,7 +25,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   return null;
 }
 
-export default function Index() {
+export default function IndexPage() {
   return (
     <div>
       <h1 className="text-2xl">Welcome to Blueprint</h1>

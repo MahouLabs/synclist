@@ -9,7 +9,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   return json({ home: data }, { headers: { "Cache-Control": "max-age=3600, public" } });
 }
 
-export default function Home() {
+export default function HomePage() {
   const { home } = useLoaderData<typeof loader>();
 
   return (

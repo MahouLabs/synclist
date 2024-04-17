@@ -13,7 +13,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     : json({ error: null, data }, { status: 200 });
 }
 
-export default function Cookbook() {
+export default function CookbookPage() {
   const { error, data } = useLoaderData<typeof loader>();
 
   console.log(error, data);

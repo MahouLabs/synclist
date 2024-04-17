@@ -53,7 +53,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   return redirect("/home");
 }
 
-export default function Onboarding() {
+export default function OnboardingPage() {
   const { user } = useLoaderData<typeof loader>();
   const { state } = useNavigation();
 

@@ -25,7 +25,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
   return json({ SUPABASE_URL, SUPABASE_KEY });
 }
 
-export default function Signin() {
+export default function SigninPage() {
   const { SUPABASE_URL, SUPABASE_KEY } = useLoaderData<typeof loader>();
   const [email, setEmail] = useState("");
   const [mode, setMode] = useState<"email" | "otp">("email");
