@@ -1,14 +1,20 @@
 import { cn } from "@/utils/cn";
 import { pathTitles } from "@/utils/path";
 import { Link, useLocation } from "@remix-run/react";
-import { CookingPot, Home, Menu, ScrollText, ShoppingCart } from "lucide-react";
+import {
+  ArrowLeft,
+  CookingPot,
+  Home,
+  Menu,
+  ScrollText,
+  ShoppingCart,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 export function Header() {
   const { pathname } = useLocation();
-  const paths = Object.keys(pathTitles);
-  const matchedPath = paths.find((path) => pathname.includes(path));
+  const subroute = pathname.slice(1).includes("/");
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -72,7 +78,14 @@ export function Header() {
           </div>
         </SheetContent>
       </Sheet>
-      <h3>{pathTitles[matchedPath as keyof typeof pathTitles]}</h3>
+      {subroute && (
+        <Link to={pathname.split("/").slice(0, -1).join("/")}>
+          <Button variant="ghost">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </Link>
+      )}
+      <h3>{pathTitles[pathname as keyof typeof pathTitles]}</h3>
       {/* <div className="w-full flex-1">
   <form>
     <div className="relative">

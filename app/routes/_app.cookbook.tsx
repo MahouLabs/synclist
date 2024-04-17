@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase.server";
 import { type LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { PlusIcon } from "lucide-react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
@@ -16,13 +16,15 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 export default function CookbookPage() {
   const { error, data } = useLoaderData<typeof loader>();
 
-  console.log(error, data);
-
   return (
     <div className="flex flex-col gap-2">
-      <Button className="ml-auto w-fit">
-        <PlusIcon height={16} /> New Recipe
-      </Button>
+      <Link to="/cookbook/new" className="ml-auto w-fit">
+        <Button>
+          <PlusIcon height={16} /> New Recipe
+        </Button>
+      </Link>
+
+      <Outlet />
     </div>
   );
 }
