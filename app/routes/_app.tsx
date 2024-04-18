@@ -1,20 +1,31 @@
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import { Outlet } from "@remix-run/react";
+import { createClient } from "@/utils/supabase.server";
+import { LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { Outlet, json, redirect, useLoaderData } from "@remix-run/react";
 
-// export function loader({ context }: LoaderFunctionArgs) {
-//   const env = {
-//     SUPABASE_URL: context.cloudflare.env.SUPABASE_URL,
-//     SUPABASE_KEY: context.cloudflare.env.SUPABASE_KEY,
-//   };
+export async function loader({ request, context }: LoaderFunctionArgs) {
+  const supabase = createClient(request, context);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-//   return json({ env }, { headers: { "Cache-Control": "public, max-age=3600" } });
-// }
+  if (!session) {
+    return redirect("/signin");
+  }
+
+  const { id: userId } = session.user;
+  const { data } = await supabase.from("homes").select("*").eq('owner_id', userId).eq("last_accessed", true).single();
+
+  return json({ home: data }, { headers: { "Cache-Control": "max-age=3600, public" } });
+}
 
 export default function AppLayout() {
+  const { home } = useLoaderData<typeof loader>();
+
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr] md:grid-cols-[220px_1fr]">
-      <Sidebar />
+      <Sidebar home={home} />
       <div className="flex flex-col">
         <Header />
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">

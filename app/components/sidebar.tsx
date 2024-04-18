@@ -2,8 +2,13 @@ import { cn } from "@/utils/cn";
 import { Link, useLocation } from "@remix-run/react";
 import { Bell, CookingPot, Home, ScrollText, ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
+import { Tables } from "@/utils/supabase.types";
 
-export function Sidebar() {
+type SidebarProps = {
+  home: Tables<'homes'> | null;
+};
+
+export function Sidebar({ home }: SidebarProps) {
   const { pathname } = useLocation();
 
   return (
@@ -64,18 +69,19 @@ export function Sidebar() {
           </nav>
         </div>
         <div className="mt-auto p-4">
-          <p>user card here</p>
-          {/* <Card>
-                  <CardHeader>
-                    <CardTitle>Upgrade to Pro</CardTitle>
-                    <CardDescription>Unlock all features and get unlimited access to our support team.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button size="sm" className="w-full">
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card> */}
+          {home && <Link
+            to="/home"
+            prefetch="viewport"
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+              {
+                "bg-muted text-primary": pathname.includes("/home"),
+              }
+            )}
+          >
+            <Home className="h-4 w-4" />
+            {home.name}
+          </Link>}
         </div>
       </div>
     </div>
