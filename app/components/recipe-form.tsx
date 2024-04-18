@@ -79,13 +79,19 @@ export function RecipeForm() {
                 <Button
                   variant="outline"
                   className="w-fit"
+                  type="button"
                   onClick={() => removeIngredient(index)}
                 >
                   <Trash className="h-4" />
                 </Button>
               </div>
             ))}
-            <Button className="w-fit" variant="outline" onClick={addNewIngredient}>
+            <Button
+              className="w-fit"
+              variant="outline"
+              onClick={addNewIngredient}
+              type="button"
+            >
               <Plus className="mr-1 h-4" /> Add ingredient
             </Button>
           </div>
@@ -123,6 +129,7 @@ export function RecipeForm() {
                 <Button
                   variant="outline"
                   className="w-fit"
+                  type="button"
                   onClick={() => removeStep(index)}
                 >
                   <Trash className="h-4" />
@@ -130,7 +137,7 @@ export function RecipeForm() {
               </Reorder.Item>
             ))}
           </Reorder.Group>
-          <Button className="w-fit" variant="outline" onClick={addNewStep}>
+          <Button className="w-fit" variant="outline" onClick={addNewStep} type="button">
             <Plus className="mr-1 h-4" /> Add step
           </Button>
           <Button className="absolute right-4 bottom-4">Save Recipe</Button>
