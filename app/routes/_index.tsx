@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase.server";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
-import { Link } from "@remix-run/react";
+import { Link, redirect } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -21,7 +21,16 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
   const user = session?.user;
 
-  // if (user) return redirect("/dashboard");
+  if (user) {
+    const userHome = await supabase.from("homes").select("*").eq("user_id", user.id).single();
+
+    if (userHome) {
+      return redirect("/home");
+    }
+
+    return redirect("/onboarding");
+  }
+
   return null;
 }
 

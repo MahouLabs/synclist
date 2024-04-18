@@ -55,7 +55,7 @@ export default function SigninPage() {
       type: "email",
     });
 
-    if (!error) navigate("/dashboard");
+    if (!error) navigate("/home");
   };
 
   return (
