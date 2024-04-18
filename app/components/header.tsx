@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import { Tables } from "@/utils/supabase.types";
+import type { Tables } from "@/utils/supabase.types";
 
 type HomeProps = {
   home: Tables<"homes"> | null;

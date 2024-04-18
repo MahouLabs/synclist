@@ -5,5 +5,5 @@ type RecipeCardProps = {
 };
 
 export function RecipeCard({ variant = "default" }: RecipeCardProps) {
-  return <Card></Card>;
+  return <Card />;
 }
