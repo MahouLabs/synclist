@@ -49,13 +49,26 @@ export default function SigninPage() {
   };
 
   const verifyOtp = async (token: string) => {
-    const { error } = await supabase.auth.verifyOtp({
+    // TODO: handle error
+    const { data } = await supabase.auth.verifyOtp({
       email,
       token,
       type: "email",
     });
 
-    if (!error) navigate("/home");
+    if (data.user) {
+      const userHome = await supabase
+        .from("home_members")
+        .select("*")
+        .eq("user_id", data.user.id)
+        .single();
+
+      if (userHome) {
+        navigate("/home");
+      }
+    }
+
+    navigate("/onboarding");
   };
 
   return (
