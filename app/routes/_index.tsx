@@ -5,10 +5,10 @@ import { Link, json, useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
+    { title: "SyncList" },
     {
       name: "description",
-      content: "Welcome to Remix! Using Vite and Cloudflare!",
+      content: "A minimalist, shareable list app!",
     },
   ];
 };
