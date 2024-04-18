@@ -1,10 +1,29 @@
 import { RecipeForm } from "@/components/recipe-form";
 import { createId } from "@/utils/ids";
 import { createClient } from "@/utils/supabase.server";
-import { type ActionFunctionArgs, redirect } from "@remix-run/cloudflare";
+import { type ActionFunctionArgs, redirect, json } from "@remix-run/cloudflare";
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const supabase = createClient(request, context);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return redirect("/signin");
+  }
+
+  const { data: loggedInHome } = await supabase
+    .from("home_members")
+    .select("*")
+    .eq("user_id", session.user.id)
+    .eq("last_accessed", true)
+    .single();
+
+  if (!loggedInHome) {
+    return json({ error: "User does not belong to a home" }, { status: 400 });
+  }
+
   const formData = await request.formData();
   const stepPattern = /^step-\d+$/;
   const ingredientNamePattern = /^ingredient-name-\d+$/;
@@ -32,15 +51,19 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const title = formData.get("title");
   const description = formData.get("description");
 
-  const { error } = await supabase.from("recipes").insert({
+  const { error: insertRecipeError } = await supabase.from("recipes").insert({
     id: createId("recipe"),
     title: String(title),
     description: String(description),
     ingredients,
     steps,
+    created_by: session.user.id,
+    belongs_to: loggedInHome.home_id,
   });
 
-  if (error) console.error(error);
+  if (insertRecipeError) {
+    return json({ error: insertRecipeError }, { status: 500 })
+  }
 
   return redirect("/recipe");
 }
