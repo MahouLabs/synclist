@@ -1,11 +1,11 @@
 import { cn } from "@/utils/cn";
+import type { Tables } from "@/utils/supabase.types";
 import { Link, useLocation } from "@remix-run/react";
 import { Bell, CookingPot, Home, ScrollText, ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
-import { Tables } from "@/utils/supabase.types";
 
 type SidebarProps = {
-  home: Tables<'homes'> | null;
+  home: Tables<"homes"> | null;
 };
 
 export function Sidebar({ home }: SidebarProps) {
@@ -69,19 +69,21 @@ export function Sidebar({ home }: SidebarProps) {
           </nav>
         </div>
         <div className="mt-auto p-4">
-          {home && <Link
-            to="/home"
-            prefetch="viewport"
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-              {
-                "bg-muted text-primary": pathname.includes("/home"),
-              }
-            )}
-          >
-            <Home className="h-4 w-4" />
-            {home.name}
-          </Link>}
+          {home && (
+            <Link
+              to="/home"
+              prefetch="viewport"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                {
+                  "bg-muted text-primary": pathname.includes("/home"),
+                }
+              )}
+            >
+              <Home className="h-4 w-4" />
+              {home.name}
+            </Link>
+          )}
         </div>
       </div>
     </div>

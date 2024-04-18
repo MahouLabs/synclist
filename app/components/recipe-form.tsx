@@ -1,5 +1,5 @@
 import { Form } from "@remix-run/react";
-import { Reorder } from "framer-motion";
+import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, Plus, Trash } from "lucide-react";
 import { nanoid } from "nanoid";
 import { useState } from "react";
@@ -12,6 +12,7 @@ import { Textarea } from "./ui/textarea";
 type Ingredient = { name: string; amount: number };
 
 export function RecipeForm() {
+  const dragControls = useDragControls();
   const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: "", amount: 0 }]);
   const [steps, setSteps] = useState([{ id: nanoid(5), text: "" }]);
 
@@ -96,12 +97,22 @@ export function RecipeForm() {
             axis="y"
             values={steps}
             onReorder={setSteps}
-            className="relative flex flex-col gap-4 px-1 mb-4"
+            className="relative mb-4 flex flex-col gap-4 px-1"
           >
             <h3 className="mb-2">Cooking Steps</h3>
             {steps.map((step, index) => (
-              <Reorder.Item key={step.id} className="flex gap-4" value={step}>
-                <GripVertical className="cursor-grab self-center" />
+              <Reorder.Item
+                key={step.id}
+                id={step.id}
+                className="flex gap-4"
+                value={step.id}
+                dragListener={false}
+                dragControls={dragControls}
+              >
+                <GripVertical
+                  className="cursor-grab self-center"
+                  onPointerDown={(e) => dragControls.start(e)}
+                />
                 <Textarea
                   className="flex-1"
                   name={`step-${index + 1}`}

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase.server";
 import { type LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { PlusIcon } from "lucide-react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
@@ -24,7 +24,13 @@ export default function CookbookPage() {
         </Button>
       </Link>
 
-      <Outlet />
+      <ul>
+        {data?.map((recipe) => (
+          <li key={recipe.id}>
+            <Link to={`/cookbook/${recipe.id}`}>{recipe.title}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

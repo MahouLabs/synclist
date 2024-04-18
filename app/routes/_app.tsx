@@ -1,7 +1,7 @@
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { createClient } from "@/utils/supabase.server";
-import { LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { Outlet, json, redirect, useLoaderData } from "@remix-run/react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
@@ -15,7 +15,12 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   }
 
   const { id: userId } = session.user;
-  const { data } = await supabase.from("homes").select("*").eq('owner_id', userId).eq("last_accessed", true).single();
+  const { data } = await supabase
+    .from("homes")
+    .select("*")
+    .eq("owner_id", userId)
+    .eq("last_accessed", true)
+    .single();
 
   return json({ home: data }, { headers: { "Cache-Control": "max-age=3600, public" } });
 }
