@@ -1,4 +1,6 @@
+import { RecipeCard } from "@/components/recipe-card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { createId } from "@/utils/ids";
 import { createClient } from "@/utils/supabase.server";
 import {
@@ -7,7 +9,9 @@ import {
   json,
 } from "@remix-run/cloudflare";
 import { Link, redirect, useLoaderData } from "@remix-run/react";
+import Fuse from "fuse.js";
 import { PlusIcon } from "lucide-react";
+import { useState } from "react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const supabase = createClient(request, context);
@@ -29,13 +33,13 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
   if (!loggedInHome) return redirect("/onboarding");
 
-  const { data, error } = await supabase
+  const { data: recipes, error } = await supabase
     .from("recipes")
-    .select("*")
+    .select("title, description, id")
     .eq("belongs_to", loggedInHome.home_id);
   return error
-    ? json({ error, data: null }, { status: 500 })
-    : json({ error: null, data }, { status: 200 });
+    ? json({ error, recipes: null }, { status: 500 })
+    : json({ error: null, recipes }, { status: 200 });
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
@@ -104,23 +108,49 @@ export async function action({ request, context }: ActionFunctionArgs) {
 }
 
 export default function RecipePage() {
-  const { error, data } = useLoaderData<typeof loader>();
+  const { error, recipes } = useLoaderData<typeof loader>();
+  const [searchResults, setSearchResults] = useState<typeof recipes>(recipes);
+
+  if (!recipes) return null;
+
+  const options = {
+    includeScore: true,
+    includeMatches: true,
+    threshold: 0.2,
+    keys: ["title", "description"],
+  };
+
+  const fuse = new Fuse(recipes, options);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    if (value.length === 0 || !value) {
+      setSearchResults(recipes);
+      return;
+    }
+
+    const results = fuse.search(value);
+    const items = results.map((result) => result.item);
+    setSearchResults(items);
+  };
 
   return (
-    <div className="flex flex-col gap-2">
-      <Link to="/recipes/new" className="ml-auto w-fit">
-        <Button>
-          <PlusIcon height={16} /> New Recipe
-        </Button>
-      </Link>
+    <div className="flex flex-col gap-4">
+      <div className="flex gap-4">
+        <Input placeholder="search..." onChange={handleSearch} />
+        <Link to="/recipes/new" className="ml-auto w-fit">
+          <Button>
+            <PlusIcon height={16} /> New Recipe
+          </Button>
+        </Link>
+      </div>
 
-      <ul>
-        {data?.map((recipe) => (
-          <li key={recipe.id}>
-            <Link to={`/recipes/${recipe.id}`}>{recipe.title}</Link>
-          </li>
+      <div className="grid grid-cols-4 gap-4">
+        {searchResults?.map((recipe) => (
+          <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
