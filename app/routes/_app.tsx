@@ -16,10 +16,9 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
   const { id: userId } = session.user;
   const { data } = await supabase
-    .from("homes")
+    .from("home_members")
     .select("*")
-    .eq("owner_id", userId)
-    .eq("last_accessed", true)
+    .eq("user_id", userId)
     .single();
 
   return json({ home: data }, { headers: { "Cache-Control": "max-age=3600, public" } });
