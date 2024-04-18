@@ -37,9 +37,9 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 export default function IndexPage() {
   return (
     <div>
-      <h1 className="text-2xl">Welcome to Blueprint</h1>
+      <h1 className="text-2xl">Welcome to SyncList</h1>
       <Link to="/signin">
-        <Button>Go to signin</Button>
+        <Button>Sign in</Button>
       </Link>
     </div>
   );
