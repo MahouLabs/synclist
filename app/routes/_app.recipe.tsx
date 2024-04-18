@@ -13,12 +13,12 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     : json({ error: null, data }, { status: 200 });
 }
 
-export default function CookbookPage() {
+export default function RecipePage() {
   const { error, data } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex flex-col gap-2">
-      <Link to="/cookbook/new" className="ml-auto w-fit">
+      <Link to="/recipe/new" className="ml-auto w-fit">
         <Button>
           <PlusIcon height={16} /> New Recipe
         </Button>
@@ -27,7 +27,7 @@ export default function CookbookPage() {
       <ul>
         {data?.map((recipe) => (
           <li key={recipe.id}>
-            <Link to={`/cookbook/${recipe.id}`}>{recipe.title}</Link>
+            <Link to={`/recipe/${recipe.id}`}>{recipe.title}</Link>
           </li>
         ))}
       </ul>

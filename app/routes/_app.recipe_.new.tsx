@@ -42,7 +42,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (error) console.error(error);
 
-  return redirect("/cookbook");
+  return redirect("/recipe");
 }
 
 export default function NewRecipePage() {

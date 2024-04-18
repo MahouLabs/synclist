@@ -11,8 +11,13 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { Tables } from "@/utils/supabase.types";
 
-export function Header() {
+type HomeProps = {
+  home: Tables<"homes"> | null;
+}
+
+export function Header({ home }: HomeProps) {
   const { pathname } = useLocation();
   const subroute = pathname.slice(1).includes("/");
 
@@ -52,14 +57,14 @@ export function Header() {
               Groceries
             </Link>
             <Link
-              to="/cookbook"
+              to="/recipe"
               className={cn(
                 "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-                { "bg-muted text-foregroud": pathname.includes("/cookbook") }
+                { "bg-muted text-foregroud": pathname.includes("/recipe") }
               )}
             >
               <CookingPot className="h-5 w-5" />
-              Cookbook
+              Recipes
             </Link>
           </nav>
           <div className="mt-auto">
