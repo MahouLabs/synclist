@@ -1,4 +1,4 @@
-import { Form, useActionData } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, Plus, Trash } from "lucide-react";
 import { nanoid } from "nanoid";
@@ -8,13 +8,10 @@ import { Input } from "./ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 // import { ScrollArea } from "./ui/scroll-area";
 import { Textarea } from "./ui/textarea";
-import { action } from "@/routes/_app.recipe_.new";
 
 type Ingredient = { name: string; amount: number };
 
 export function RecipeForm() {
-  const data = useActionData<typeof action>();
-
   // TODO show toast or error message somwhere using data.error
   // by now, thats enough to stop redirecting
 
@@ -51,7 +48,7 @@ export function RecipeForm() {
   };
 
   return (
-    <Form className="h-full" method="POST" navigate={false}>
+    <Form className="h-full" method="POST" navigate={false} action="/recipes">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel minSize={30} className="px-1">
           <div className="flex flex-col gap-4">
