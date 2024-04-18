@@ -1,9 +1,34 @@
-import { Card } from "./ui/card";
+import type { Tables } from "@/utils/supabase.types";
+import { useNavigate } from "@remix-run/react";
+import { Card, CardContent, CardHeader } from "./ui/card";
 
 type RecipeCardProps = {
-  variant: "default" | "compact";
+  recipe: Pick<Tables<"recipes">, "id" | "title" | "description">;
+  variant?: "compact" | "default";
 };
 
-export function RecipeCard({ variant = "default" }: RecipeCardProps) {
-  return <Card />;
+export function RecipeCard({ recipe, variant = "default" }: RecipeCardProps) {
+  const navigate = useNavigate();
+
+  if (variant === "compact") {
+    return (
+      <Card>
+        <CardHeader>a</CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <Card
+      className="cursor-pointer select-none"
+      onClick={() => navigate(`/recipes/${recipe.id}`)}
+    >
+      <CardHeader>
+        <h3>{recipe.title}</h3>
+      </CardHeader>
+      <CardContent>
+        <p>{recipe.description}</p>
+      </CardContent>
+    </Card>
+  );
 }
