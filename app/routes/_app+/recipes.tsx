@@ -138,15 +138,15 @@ export default function RecipePage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-4">
-        <Input placeholder="search..." onChange={handleSearch} />
-        <Link to="/recipes/new" className="ml-auto w-fit">
-          <Button>
-            <PlusIcon height={16} /> New Recipe
-          </Button>
-        </Link>
+        <Input placeholder="Search..." onChange={handleSearch} />
+        <Button asChild>
+          <Link to="/recipes/new" className="min-w-32">
+            <PlusIcon className="mr-1 h-4 shrink-0" /> New Recipe
+          </Link>
+        </Button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid gap-4 2xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
         {searchResults?.map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
