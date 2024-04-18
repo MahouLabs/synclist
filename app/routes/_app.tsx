@@ -32,7 +32,7 @@ export default function AppLayout() {
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr] md:grid-cols-[220px_1fr]">
       <Sidebar home={home} />
       <div className="flex flex-col">
-        <Header />
+        <Header home={home} />
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           <Outlet />
         </main>

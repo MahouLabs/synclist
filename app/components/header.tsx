@@ -68,18 +68,21 @@ export function Header({ home }: HomeProps) {
             </Link>
           </nav>
           <div className="mt-auto">
-            <p>user card here</p>
-            {/* <Card>
-        <CardHeader>
-          <CardTitle>Upgrade to Pro</CardTitle>
-          <CardDescription>Unlock all features and get unlimited access to our support team.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button size="sm" className="w-full">
-            Upgrade
-          </Button>
-        </CardContent>
-      </Card> */}
+            {home && (
+              <Link
+                to="/home"
+                prefetch="viewport"
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                  {
+                    "bg-muted text-primary": pathname.includes("/home"),
+                  }
+                )}
+              >
+                <Home className="h-4 w-4" />
+                {home.name}
+              </Link>
+            )}
           </div>
         </SheetContent>
       </Sheet>
