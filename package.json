@@ -43,6 +43,7 @@
     "react-dom": "canary",
     "react-hook-form": "^7.51.1",
     "react-resizable-panels": "^2.0.17",
+    "remix-flat-routes": "^0.6.4",
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",

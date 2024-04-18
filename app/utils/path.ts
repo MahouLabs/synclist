@@ -1,6 +1,6 @@
 export const pathTitles = {
   "/home": "Home",
   "/groceries": "Groceries",
-  "/recipe": "Recipes",
-  "/recipe/new": "New recipe",
+  "/recipes": "Recipes",
+  "/recipes/new": "New recipe",
 } as const;

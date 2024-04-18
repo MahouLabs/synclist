@@ -56,10 +56,10 @@ export function Header({ homeName }: HeaderProps) {
               Groceries
             </Link>
             <Link
-              to="/recipe"
+              to="/recipes"
               className={cn(
                 "mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground",
-                { "bg-muted text-foregroud": pathname.includes("/recipe") }
+                { "bg-muted text-foregroud": pathname.includes("/recipes") }
               )}
             >
               <CookingPot className="h-5 w-5" />
