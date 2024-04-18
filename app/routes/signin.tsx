@@ -57,14 +57,14 @@ export default function SigninPage() {
     });
 
     if (data.user) {
-      const userHome = await supabase
+      const { data: userHome } = await supabase
         .from("home_members")
         .select("*")
         .eq("user_id", data.user.id)
         .single();
 
       if (userHome) {
-        navigate("/home");
+        return navigate("/home");
       }
     }
 
