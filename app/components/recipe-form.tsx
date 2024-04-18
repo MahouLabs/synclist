@@ -1,5 +1,5 @@
 import { Form } from "@remix-run/react";
-import { Reorder } from "framer-motion";
+import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, Plus, Trash } from "lucide-react";
 import { nanoid } from "nanoid";
 import { useState } from "react";
@@ -12,6 +12,7 @@ import { Textarea } from "./ui/textarea";
 type Ingredient = { name: string; amount: number };
 
 export function RecipeForm() {
+  const dragControls = useDragControls();
   const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: "", amount: 0 }]);
   const [steps, setSteps] = useState([{ id: nanoid(5), text: "" }]);
 
@@ -78,13 +79,19 @@ export function RecipeForm() {
                 <Button
                   variant="outline"
                   className="w-fit"
+                  type="button"
                   onClick={() => removeIngredient(index)}
                 >
                   <Trash className="h-4" />
                 </Button>
               </div>
             ))}
-            <Button className="w-fit" variant="outline" onClick={addNewIngredient}>
+            <Button
+              className="w-fit"
+              variant="outline"
+              onClick={addNewIngredient}
+              type="button"
+            >
               <Plus className="mr-1 h-4" /> Add ingredient
             </Button>
           </div>
@@ -96,12 +103,22 @@ export function RecipeForm() {
             axis="y"
             values={steps}
             onReorder={setSteps}
-            className="relative flex flex-col gap-4 px-1 mb-4"
+            className="relative mb-4 flex flex-col gap-4 px-1"
           >
             <h3 className="mb-2">Cooking Steps</h3>
             {steps.map((step, index) => (
-              <Reorder.Item key={step.id} className="flex gap-4" value={step}>
-                <GripVertical className="cursor-grab self-center" />
+              <Reorder.Item
+                key={step.id}
+                id={step.id}
+                className="flex gap-4"
+                value={step.id}
+                dragListener={false}
+                dragControls={dragControls}
+              >
+                <GripVertical
+                  className="cursor-grab self-center"
+                  onPointerDown={(e) => dragControls.start(e)}
+                />
                 <Textarea
                   className="flex-1"
                   name={`step-${index + 1}`}
@@ -112,6 +129,7 @@ export function RecipeForm() {
                 <Button
                   variant="outline"
                   className="w-fit"
+                  type="button"
                   onClick={() => removeStep(index)}
                 >
                   <Trash className="h-4" />
@@ -119,7 +137,7 @@ export function RecipeForm() {
               </Reorder.Item>
             ))}
           </Reorder.Group>
-          <Button className="w-fit" variant="outline" onClick={addNewStep}>
+          <Button className="w-fit" variant="outline" onClick={addNewStep} type="button">
             <Plus className="mr-1 h-4" /> Add step
           </Button>
           <Button className="absolute right-4 bottom-4">Save Recipe</Button>

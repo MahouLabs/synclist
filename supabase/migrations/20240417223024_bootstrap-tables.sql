@@ -3,26 +3,23 @@ create table "public"."home_members" (
     "user_id" uuid not null
 );
 
-
 create table "public"."homes" (
     "id" character varying(25) not null,
     "name" text not null,
     "owner_id" uuid not null,
-    "cookbook_id" character varying(25) not null
+    "last_accessed" boolean DEFAULT false
 );
-
 
 alter table "public"."homes" enable row level security;
 
 create table "public"."recipes" (
     "id" character varying(25) not null,
-    "cookbook_id" character varying(25) not null,
-    "name" character varying(255) not null,
+    "title" character varying(255) not null,
+    "description" character varying(255) null,
     "picture_url" text,
-    "ingredients" json not null,
-    "steps" json not null
+    "ingredients" jsonb not null,
+    "steps" jsonb not null
 );
-
 
 CREATE UNIQUE INDEX home_members_pkey ON public.home_members USING btree (home_id, user_id);
 

@@ -1,10 +1,20 @@
 import { createClient } from "@/utils/supabase.server";
 import { type LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { redirect, useLoaderData } from "@remix-run/react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const supabase = createClient(request, context);
-  const { data } = await supabase.from("homes").select("*");
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return redirect("/signin");
+  }
+
+  const { id: userId } = session.user;
+  const { data } = await supabase.from("homes").select("*").eq('owner_id', userId).eq("last_accessed", true).single();
+
 
   return json({ home: data }, { headers: { "Cache-Control": "max-age=3600, public" } });
 }

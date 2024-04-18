@@ -10,7 +10,7 @@ import {
   json,
   redirect,
 } from "@remix-run/cloudflare";
-import { Form, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import { Loader, ScrollText } from "lucide-react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
@@ -41,20 +41,27 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (!homeName) return json({ error: "Home name is required" }, { status: 400 });
 
-  const { error } = await supabase.from("homes").insert({
-    id: createId("home"),
+  const homeId = createId("home");
+  const { error: createHomeError } = await supabase.from("homes").insert({
+    id: homeId,
     owner_id: session.user.id,
-    cookbook_id: createId("cookbook"),
     name: String(homeName),
+    last_accessed: true
   });
 
-  if (error) return json({ error }, { status: 500 });
+  if (createHomeError) return json({ error: createHomeError }, { status: 500 });
+
+  const { error: createHomeUserError } = await supabase.from("home_members").insert({
+    home_id: homeId,
+    user_id: session.user.id,
+  });
+
+  if (createHomeUserError) return json({ error: createHomeUserError }, { status: 500 });
 
   return redirect("/home");
 }
 
 export default function OnboardingPage() {
-  const { user } = useLoaderData<typeof loader>();
   const { state } = useNavigation();
 
   return (

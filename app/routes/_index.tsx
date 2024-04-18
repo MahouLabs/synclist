@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase.server";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
-import { Link } from "@remix-run/react";
+import { Link, json, useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -21,16 +21,17 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
   const user = session?.user;
 
-  // if (user) return redirect("/dashboard");
-  return null;
+  return json({ user });
 }
 
 export default function IndexPage() {
+  const { user } = useLoaderData<typeof loader>();
+
   return (
     <div>
-      <h1 className="text-2xl">Welcome to Blueprint</h1>
-      <Link to="/signin">
-        <Button>Go to signin</Button>
+      <h1 className="text-2xl">Welcome to SyncList</h1>
+      <Link to={user ? "/home" : "/signin"}>
+        <Button>{user ? "Go to home" : "Sign in"}</Button>
       </Link>
     </div>
   );
