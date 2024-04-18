@@ -22,7 +22,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   const user = session?.user;
 
   if (user) {
-    const userHome = await supabase.from("homes").select("*").eq("user_id", user.id).single();
+    const userHome = await supabase.from("home_members").select("*").eq("user_id", user.id).single();
 
     if (userHome) {
       return redirect("/home");
@@ -30,8 +30,6 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
     return redirect("/onboarding");
   }
-
-  return null;
 }
 
 export default function IndexPage() {
