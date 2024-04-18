@@ -46,7 +46,6 @@ export async function action({ request, context }: ActionFunctionArgs) {
     id: homeId,
     owner_id: session.user.id,
     name: String(homeName),
-    last_accessed: true
   });
 
   if (createHomeError) return json({ error: createHomeError }, { status: 500 });
@@ -54,6 +53,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const { error: createHomeUserError } = await supabase.from("home_members").insert({
     home_id: homeId,
     user_id: session.user.id,
+    last_accessed: true,
   });
 
   if (createHomeUserError) return json({ error: createHomeUserError }, { status: 500 });

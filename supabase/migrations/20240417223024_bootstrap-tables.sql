@@ -1,13 +1,14 @@
 create table "public"."home_members" (
     "home_id" character varying(25) not null,
-    "user_id" uuid not null
+    "user_id" uuid not null,
+    "last_accessed" boolean DEFAULT false
 );
 
 create table "public"."homes" (
     "id" character varying(25) not null,
     "name" text not null,
     "owner_id" uuid not null,
-    "last_accessed" boolean DEFAULT false
+    "created_at" timestamp with time zone default now() not null
 );
 
 alter table "public"."homes" enable row level security;
@@ -16,9 +17,11 @@ create table "public"."recipes" (
     "id" character varying(25) not null,
     "title" character varying(255) not null,
     "description" character varying(255) null,
-    "picture_url" text,
     "ingredients" jsonb not null,
-    "steps" jsonb not null
+    "steps" jsonb not null,
+    "belongs_to" character varying(25) not null,
+    "created_by" uuid not null,
+    "created_at" timestamp with time zone default now() not null
 );
 
 CREATE UNIQUE INDEX home_members_pkey ON public.home_members USING btree (home_id, user_id);
@@ -44,6 +47,14 @@ alter table "public"."home_members" validate constraint "home_members_user_id_fk
 alter table "public"."homes" add constraint "homes_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES auth.users(id) not valid;
 
 alter table "public"."homes" validate constraint "homes_owner_id_fkey";
+
+alter table "public"."recipes" add constraint "recipes_created_by_fkey" FOREIGN KEY (created_by) REFERENCES auth.users(id) not valid;
+
+alter table "public"."recipes" validate constraint "recipes_created_by_fkey";
+
+alter table "public"."recipes" add constraint "recipes_belongs_to_fkey" FOREIGN KEY (belongs_to) REFERENCES homes(id) not valid;
+
+alter table "public"."recipes" validate constraint "recipes_belongs_to_fkey";
 
 grant delete on table "public"."home_members" to "anon";
 
