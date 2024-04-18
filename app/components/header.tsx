@@ -11,13 +11,12 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
-import type { Tables } from "@/utils/supabase.types";
 
-type HomeProps = {
-  home: Tables<"homes"> | null;
-}
+type HeaderProps = {
+  homeName?: string;
+};
 
-export function Header({ home }: HomeProps) {
+export function Header({ homeName }: HeaderProps) {
   const { pathname } = useLocation();
   const subroute = pathname.slice(1).includes("/");
 
@@ -68,7 +67,7 @@ export function Header({ home }: HomeProps) {
             </Link>
           </nav>
           <div className="mt-auto">
-            {home && (
+            {homeName && (
               <Link
                 to="/home"
                 prefetch="viewport"
@@ -80,7 +79,7 @@ export function Header({ home }: HomeProps) {
                 )}
               >
                 <Home className="h-4 w-4" />
-                {home.name}
+                {homeName}
               </Link>
             )}
           </div>
