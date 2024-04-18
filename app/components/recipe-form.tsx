@@ -1,4 +1,4 @@
-import { Form } from "@remix-run/react";
+import { Form, useActionData } from "@remix-run/react";
 import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, Plus, Trash } from "lucide-react";
 import { nanoid } from "nanoid";
@@ -8,10 +8,16 @@ import { Input } from "./ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 // import { ScrollArea } from "./ui/scroll-area";
 import { Textarea } from "./ui/textarea";
+import { action } from "@/routes/_app.recipe_.new";
 
 type Ingredient = { name: string; amount: number };
 
 export function RecipeForm() {
+  const data = useActionData<typeof action>();
+
+  // TODO show toast or error message somwhere using data.error
+  // by now, thats enough to stop redirecting
+
   const dragControls = useDragControls();
   const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: "", amount: 0 }]);
   const [steps, setSteps] = useState([{ id: nanoid(5), text: "" }]);
