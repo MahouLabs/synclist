@@ -5,7 +5,6 @@ export const nanoid = customAlphabet(
 
 const prefixes = {
   home: "home",
-  cookbook: "ckbk",
   recipe: "recp",
 } as const;
 
