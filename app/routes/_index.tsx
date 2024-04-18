@@ -31,7 +31,7 @@ export default function IndexPage() {
     <div>
       <h1 className="text-2xl">Welcome to SyncList</h1>
       <Link to={user ? "/home" : "/signin"}>
-        <Button>Go to {user ? "home" : "signin"}</Button>
+        <Button>{user ? "Go to home" : "Sign in"}</Button>
       </Link>
     </div>
   );
