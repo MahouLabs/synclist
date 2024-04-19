@@ -27,9 +27,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   const body = await request.formData();
   console.log(body.get("item"));
+  return null;
 }
 
 export default function NewRecipePage() {
   const { items } = useLoaderData<typeof loader>();
-  return <RecipeForm ingredients={items} />;
+  return <RecipeForm ingredients={items || []} />;
 }
