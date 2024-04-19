@@ -1,6 +1,7 @@
 import { breakpoints, useWindowWidth } from "@/hooks/useWindowWidth";
 import { cn } from "@/utils/cn";
-import { Form, useNavigation } from "@remix-run/react";
+import type { Tables } from "@/utils/supabase.types";
+import { Form } from "@remix-run/react";
 import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, Plus, Trash } from "lucide-react";
 import { nanoid } from "nanoid";
@@ -8,26 +9,32 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
-// import { ScrollArea } from "./ui/scroll-area";
 import { Textarea } from "./ui/textarea";
+// import { ScrollArea } from "./ui/scr
 
-type Ingredient = { name: string; amount: number };
+type Ingredient = Omit<Tables<"items">, "home_id">;
 
-function TitleAndIngredients() {
-  const [ingredients, setIngredients] = useState<Ingredient[]>([{ name: "", amount: 0 }]);
+type RecipeFormProps = {
+  ingredients: Ingredient[];
+};
+
+function TitleAndIngredients({ ingredients }: { ingredients: Ingredient[] }) {
+  const [items, setItems] = useState<{ name: string; amount: number }[]>([
+    { name: "", amount: 0 },
+  ]);
 
   const addNewIngredient = () => {
-    setIngredients((prev) => [...prev, { name: "", amount: 0 }]);
+    setItems((prev) => [...prev, { name: "", amount: 0 }]);
   };
 
   const removeIngredient = (index: number) => {
-    setIngredients((prev) => prev.filter((_, i) => i !== index));
+    setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleIngredientChange = (index: number, name: string, amount: number) => {
-    const newIngredients = [...ingredients];
+    const newIngredients = [...items];
     newIngredients[index] = { name, amount };
-    setIngredients(newIngredients);
+    setItems(newIngredients);
   };
 
   return (
@@ -138,8 +145,10 @@ function Steps() {
   );
 }
 
-export function RecipeForm() {
+export function RecipeForm({ ingredients }: RecipeFormProps) {
   const width = useWindowWidth();
+
+  console.log({ ingredients });
 
   // TODO show toast or error message somwhere using data.error
   // by now, thats enough to stop redirecting
@@ -152,7 +161,7 @@ export function RecipeForm() {
           className="hidden"
         >
           <ResizablePanel minSize={30} className="px-1">
-            <TitleAndIngredients />
+            <TitleAndIngredients ingredients={ingredients} />
           </ResizablePanel>
           <ResizableHandle
             withHandle
