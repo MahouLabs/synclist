@@ -84,18 +84,24 @@ export type Database = {
           id: string
           name: string
           owner_id: string
+          schedule_created_at: string
+          schedule_reset_at: string
         }
         Insert: {
           created_at?: string
           id: string
           name: string
           owner_id?: string
+          schedule_created_at?: string
+          schedule_reset_at: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
           owner_id?: string
+          schedule_created_at?: string
+          schedule_reset_at?: string
         }
         Relationships: [
           {
@@ -137,21 +143,21 @@ export type Database = {
         Row: {
           description: string | null
           home_id: string | null
-          id: number
+          id: string
           steps: Json[]
           title: string
         }
         Insert: {
           description?: string | null
           home_id?: string | null
-          id?: number
+          id: string
           steps?: Json[]
           title: string
         }
         Update: {
           description?: string | null
           home_id?: string | null
-          id?: number
+          id?: string
           steps?: Json[]
           title?: string
         }
@@ -169,17 +175,17 @@ export type Database = {
         Row: {
           amount: number
           item_id: string
-          recipe_id: number
+          recipe_id: string
         }
         Insert: {
           amount: number
           item_id: string
-          recipe_id: number
+          recipe_id: string
         }
         Update: {
           amount?: number
           item_id?: string
-          recipe_id?: number
+          recipe_id?: string
         }
         Relationships: [
           {
@@ -200,16 +206,16 @@ export type Database = {
       }
       recipes_tags: {
         Row: {
-          recipe_id: number
-          tag_id: number
+          recipe_id: string
+          tag_id: string
         }
         Insert: {
-          recipe_id: number
-          tag_id?: number
+          recipe_id: string
+          tag_id: string
         }
         Update: {
-          recipe_id?: number
-          tag_id?: number
+          recipe_id?: string
+          tag_id?: string
         }
         Relationships: [
           {
@@ -228,64 +234,35 @@ export type Database = {
           },
         ]
       }
-      schedules: {
+      schedules_recipes: {
         Row: {
-          created_at: string
           home_id: string
-          id: number
-          reset_at: string
+          recipe_id: string
+          servings: number
         }
         Insert: {
-          created_at?: string
           home_id: string
-          id?: number
-          reset_at: string
+          recipe_id: string
+          servings?: number
         }
         Update: {
-          created_at?: string
           home_id?: string
-          id?: number
-          reset_at?: string
+          recipe_id?: string
+          servings?: number
         }
         Relationships: [
           {
-            foreignKeyName: "public_schedules_home_id_fkey"
+            foreignKeyName: "public_schedules_recipes_home_id_fkey"
             columns: ["home_id"]
             isOneToOne: false
             referencedRelation: "homes"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      schedules_recipes: {
-        Row: {
-          recipe_id: number
-          schedule_id: number
-          servings: number
-        }
-        Insert: {
-          recipe_id: number
-          schedule_id?: number
-          servings?: number
-        }
-        Update: {
-          recipe_id?: number
-          schedule_id?: number
-          servings?: number
-        }
-        Relationships: [
           {
             foreignKeyName: "public_schedules_recipes_recipe_id_fkey"
             columns: ["recipe_id"]
             isOneToOne: false
             referencedRelation: "recipes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_schedules_recipes_schedule_id_fkey"
-            columns: ["schedule_id"]
-            isOneToOne: false
-            referencedRelation: "schedules"
             referencedColumns: ["id"]
           },
         ]
@@ -294,19 +271,19 @@ export type Database = {
         Row: {
           color: string
           home_id: string
-          id: number
+          id: string
           name: string
         }
         Insert: {
           color: string
           home_id: string
-          id?: number
+          id: string
           name: string
         }
         Update: {
           color?: string
           home_id?: string
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: [

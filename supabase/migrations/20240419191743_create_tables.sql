@@ -21,7 +21,9 @@ create table "public"."homes" (
     "id" character varying not null,
     "name" text not null,
     "owner_id" uuid not null default auth.uid(),
-    "created_at" timestamp with time zone not null default now()
+    "created_at" timestamp with time zone not null default now(),
+    "schedule_created_at" timestamp with time zone not null default now(),
+    "schedule_reset_at" timestamp with time zone not null
 );
 
 
@@ -64,18 +66,8 @@ create table "public"."recipes_tags" (
 
 alter table "public"."recipes_tags" enable row level security;
 
-create table "public"."schedules" (
-    "id" character varying not null,
-    "home_id" character varying not null,
-    "created_at" timestamp with time zone not null default now(),
-    "reset_at" timestamp with time zone not null
-);
-
-
-alter table "public"."schedules" enable row level security;
-
 create table "public"."schedules_recipes" (
-    "schedule_id" character varying not null,
+    "home_id" character varying not null,
     "recipe_id" character varying not null,
     "servings" smallint not null default '1'::smallint
 );
@@ -107,9 +99,7 @@ CREATE UNIQUE INDEX recipes_pkey ON public.recipes USING btree (id);
 
 CREATE UNIQUE INDEX recipes_tags_pkey ON public.recipes_tags USING btree (tag_id, recipe_id);
 
-CREATE UNIQUE INDEX schedules_pkey ON public.schedules USING btree (id);
-
-CREATE UNIQUE INDEX schedules_recipes_pkey ON public.schedules_recipes USING btree (schedule_id, recipe_id);
+CREATE UNIQUE INDEX schedules_recipes_pkey ON public.schedules_recipes USING btree (home_id, recipe_id);
 
 CREATE UNIQUE INDEX tags_pkey ON public.tags USING btree (id);
 
@@ -126,8 +116,6 @@ alter table "public"."recipes" add constraint "recipes_pkey" PRIMARY KEY using i
 alter table "public"."recipes_items" add constraint "recipe_items_pkey" PRIMARY KEY using index "recipe_items_pkey";
 
 alter table "public"."recipes_tags" add constraint "recipes_tags_pkey" PRIMARY KEY using index "recipes_tags_pkey";
-
-alter table "public"."schedules" add constraint "schedules_pkey" PRIMARY KEY using index "schedules_pkey";
 
 alter table "public"."schedules_recipes" add constraint "schedules_recipes_pkey" PRIMARY KEY using index "schedules_recipes_pkey";
 
@@ -177,17 +165,13 @@ alter table "public"."recipes_tags" add constraint "public_recipes_tags_tag_id_f
 
 alter table "public"."recipes_tags" validate constraint "public_recipes_tags_tag_id_fkey";
 
-alter table "public"."schedules" add constraint "public_schedules_home_id_fkey" FOREIGN KEY (home_id) REFERENCES homes(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
-
-alter table "public"."schedules" validate constraint "public_schedules_home_id_fkey";
-
 alter table "public"."schedules_recipes" add constraint "public_schedules_recipes_recipe_id_fkey" FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
 alter table "public"."schedules_recipes" validate constraint "public_schedules_recipes_recipe_id_fkey";
 
-alter table "public"."schedules_recipes" add constraint "public_schedules_recipes_schedule_id_fkey" FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+alter table "public"."schedules_recipes" add constraint "public_schedules_recipes_home_id_fkey" FOREIGN KEY (home_id) REFERENCES homes(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
-alter table "public"."schedules_recipes" validate constraint "public_schedules_recipes_schedule_id_fkey";
+alter table "public"."schedules_recipes" validate constraint "public_schedules_recipes_home_id_fkey";
 
 alter table "public"."tags" add constraint "public_tags_home_id_fkey" FOREIGN KEY (home_id) REFERENCES homes(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
@@ -486,48 +470,6 @@ grant trigger on table "public"."recipes_tags" to "service_role";
 grant truncate on table "public"."recipes_tags" to "service_role";
 
 grant update on table "public"."recipes_tags" to "service_role";
-
-grant delete on table "public"."schedules" to "anon";
-
-grant insert on table "public"."schedules" to "anon";
-
-grant references on table "public"."schedules" to "anon";
-
-grant select on table "public"."schedules" to "anon";
-
-grant trigger on table "public"."schedules" to "anon";
-
-grant truncate on table "public"."schedules" to "anon";
-
-grant update on table "public"."schedules" to "anon";
-
-grant delete on table "public"."schedules" to "authenticated";
-
-grant insert on table "public"."schedules" to "authenticated";
-
-grant references on table "public"."schedules" to "authenticated";
-
-grant select on table "public"."schedules" to "authenticated";
-
-grant trigger on table "public"."schedules" to "authenticated";
-
-grant truncate on table "public"."schedules" to "authenticated";
-
-grant update on table "public"."schedules" to "authenticated";
-
-grant delete on table "public"."schedules" to "service_role";
-
-grant insert on table "public"."schedules" to "service_role";
-
-grant references on table "public"."schedules" to "service_role";
-
-grant select on table "public"."schedules" to "service_role";
-
-grant trigger on table "public"."schedules" to "service_role";
-
-grant truncate on table "public"."schedules" to "service_role";
-
-grant update on table "public"."schedules" to "service_role";
 
 grant delete on table "public"."schedules_recipes" to "anon";
 
