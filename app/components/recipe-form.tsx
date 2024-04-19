@@ -151,7 +151,6 @@ function Steps() {
 
 export function RecipeForm() {
   const width = useWindowWidth();
-  const breakpoint = breakpoints;
 
   // TODO show toast or error message somwhere using data.error
   // by now, thats enough to stop redirecting
