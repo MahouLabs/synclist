@@ -50,7 +50,7 @@ function TitleAndIngredients({ ingredients }: { ingredients: Ingredient[] }) {
       </div>
       <div className="flex flex-col gap-4">
         <h3 className="mt-4 mb-2">Ingredients</h3>
-        {ingredients.map((ingredient, index) => (
+        {items.map((ingredient, index) => (
           <div key={`ingredient-${index + 1}`} className="flex gap-4">
             <Input
               className="basis-2/3"
