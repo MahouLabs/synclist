@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
-
+import { ScreenSize } from "./components/screen";
 import "./global.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -19,6 +19,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="dark">
+        <ScreenSize />
         {children}
         <ScrollRestoration />
         <Scripts />

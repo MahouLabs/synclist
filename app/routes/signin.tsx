@@ -92,8 +92,8 @@ export default function SigninPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Button type="submit" disabled={loading}>
-                {loading ? "Sending..." : "Send magic link"}
+              <Button type="submit" loading={loading}>
+                Send magic link
               </Button>
             </form>
           )}
@@ -116,7 +116,7 @@ export default function SigninPage() {
                   </InputOTPGroup>
                 </InputOTP>
               </div>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" loading={loading}>
                 Submit
               </Button>
             </div>
