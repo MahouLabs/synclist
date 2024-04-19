@@ -7,59 +7,70 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
-      home_members: {
+      groceries: {
         Row: {
+          amount: number
+          bought: boolean
           home_id: string
-          last_accessed: boolean | null
-          user_id: string
+          item_id: string
         }
         Insert: {
+          amount: number
+          bought?: boolean
           home_id: string
-          last_accessed?: boolean | null
-          user_id: string
+          item_id: string
         }
         Update: {
+          amount?: number
+          bought?: boolean
           home_id?: string
-          last_accessed?: boolean | null
-          user_id?: string
+          item_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "home_members_home_id_fkey"
+            foreignKeyName: "public_groceries_home_id_fkey"
             columns: ["home_id"]
             isOneToOne: false
             referencedRelation: "homes"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "home_members_user_id_fkey"
+            foreignKeyName: "public_groceries_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      home_members: {
+        Row: {
+          home_id: string
+          last_accessed: boolean
+          user_id: string
+        }
+        Insert: {
+          home_id: string
+          last_accessed?: boolean
+          user_id: string
+        }
+        Update: {
+          home_id?: string
+          last_accessed?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_home_members_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_home_members_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -78,7 +89,7 @@ export type Database = {
           created_at?: string
           id: string
           name: string
-          owner_id: string
+          owner_id?: string
         }
         Update: {
           created_at?: string
@@ -88,7 +99,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "homes_owner_id_fkey"
+            foreignKeyName: "public_homes_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -96,176 +107,214 @@ export type Database = {
           },
         ]
       }
-      recipes: {
+      items: {
         Row: {
-          belongs_to: string
-          created_at: string
-          created_by: string
-          description: string | null
+          home_id: string
           id: string
-          ingredients: Json
-          steps: Json
-          title: string
+          name: string
         }
         Insert: {
-          belongs_to: string
-          created_at?: string
-          created_by: string
-          description?: string | null
+          home_id: string
           id: string
-          ingredients: Json
-          steps: Json
-          title: string
+          name: string
         }
         Update: {
-          belongs_to?: string
-          created_at?: string
-          created_by?: string
-          description?: string | null
+          home_id?: string
           id?: string
-          ingredients?: Json
-          steps?: Json
-          title?: string
+          name?: string
         }
         Relationships: [
           {
-            foreignKeyName: "recipes_belongs_to_fkey"
-            columns: ["belongs_to"]
+            foreignKeyName: "public_items_home_id_fkey"
+            columns: ["home_id"]
             isOneToOne: false
             referencedRelation: "homes"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "recipes_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
+      recipes: {
         Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          updated_at: string | null
+          description: string | null
+          home_id: string | null
+          id: number
+          steps: Json[]
+          title: string
         }
         Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
+          description?: string | null
+          home_id?: string | null
           id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          version?: string | null
+          steps?: Json[]
+          title: string
         }
         Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          version?: string | null
+          description?: string | null
+          home_id?: string | null
+          id?: number
+          steps?: Json[]
+          title?: string
         }
         Relationships: [
           {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
+            foreignKeyName: "public_recipes_home_id_fkey"
+            columns: ["home_id"]
             isOneToOne: false
-            referencedRelation: "buckets"
+            referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes_items: {
+        Row: {
+          amount: number
+          item_id: string
+          recipe_id: number
+        }
+        Insert: {
+          amount: number
+          item_id: string
+          recipe_id: number
+        }
+        Update: {
+          amount?: number
+          item_id?: string
+          recipe_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_recipe_items_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_recipe_items_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes_tags: {
+        Row: {
+          recipe_id: number
+          tag_id: number
+        }
+        Insert: {
+          recipe_id: number
+          tag_id?: number
+        }
+        Update: {
+          recipe_id?: number
+          tag_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_recipes_tags_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_recipes_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedules: {
+        Row: {
+          created_at: string
+          home_id: string
+          id: number
+          reset_at: string
+        }
+        Insert: {
+          created_at?: string
+          home_id: string
+          id?: number
+          reset_at: string
+        }
+        Update: {
+          created_at?: string
+          home_id?: string
+          id?: number
+          reset_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_schedules_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedules_recipes: {
+        Row: {
+          recipe_id: number
+          schedule_id: number
+          servings: number
+        }
+        Insert: {
+          recipe_id: number
+          schedule_id?: number
+          servings?: number
+        }
+        Update: {
+          recipe_id?: number
+          schedule_id?: number
+          servings?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_schedules_recipes_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_schedules_recipes_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tags: {
+        Row: {
+          color: string
+          home_id: string
+          id: number
+          name: string
+        }
+        Insert: {
+          color: string
+          home_id: string
+          id?: number
+          name: string
+        }
+        Update: {
+          color?: string
+          home_id?: string
+          id?: number
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_tags_home_id_fkey"
+            columns: ["home_id"]
+            isOneToOne: false
+            referencedRelation: "homes"
             referencedColumns: ["id"]
           },
         ]
@@ -275,60 +324,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_insert_object: {
-        Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
-        }
-        Returns: undefined
-      }
-      extension: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      filename: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      foldername: {
-        Args: {
-          name: string
-        }
-        Returns: string[]
-      }
-      get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          size: number
-          bucket_id: string
-        }[]
-      }
-      search: {
-        Args: {
-          prefix: string
-          bucketname: string
-          limits?: number
-          levels?: number
-          offsets?: number
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          updated_at: string
-          created_at: string
-          last_accessed_at: string
-          metadata: Json
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
