@@ -34,6 +34,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      groceries: {
+        Row: {
+          belongs_to: string
+          completed: boolean
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+        }
+        Insert: {
+          belongs_to: string
+          completed: boolean
+          created_at?: string
+          created_by: string
+          id: string
+          name: string
+        }
+        Update: {
+          belongs_to?: string
+          completed?: boolean
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "groceries_belongs_to_fkey"
+            columns: ["belongs_to"]
+            isOneToOne: false
+            referencedRelation: "homes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groceries_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groceries_recipes: {
+        Row: {
+          grocery_id: string
+          recipe_id: string
+        }
+        Insert: {
+          grocery_id: string
+          recipe_id: string
+        }
+        Update: {
+          grocery_id?: string
+          recipe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "groceries_recipes_grocery_id_fkey"
+            columns: ["grocery_id"]
+            isOneToOne: false
+            referencedRelation: "groceries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groceries_recipes_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       home_members: {
         Row: {
           home_id: string
