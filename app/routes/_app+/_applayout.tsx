@@ -14,15 +14,20 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     return redirect("/signin");
   }
 
-  const { id: userId } = session.user;
   const { data } = await supabase
-    .from("home_members")
-    .select("homes(name)")
-    .eq("user_id", userId)
+    .from("homes")
+    .select(`
+      *,
+      home_members (
+        last_accessed
+      )
+    `)
+    .eq("owner_id", session.user.id)
+    .eq("home_members.last_accessed", true)
     .single();
 
   return json(
-    { home: data?.homes },
+    { home: data },
     { headers: { "Cache-Control": "max-age=3600, public" } }
   );
 }

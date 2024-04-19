@@ -57,13 +57,19 @@ export default function SigninPage() {
     });
 
     if (data.user) {
-      const { data: userHome } = await supabase
-        .from("home_members")
-        .select("*")
-        .eq("user_id", data.user.id)
+      const { data: loggedInHome } = await supabase
+        .from("homes")
+        .select(`
+          *,
+          home_members (
+            last_accessed
+          )
+        `)
+        .eq("owner_id", data.user.id)
+        .eq("home_members.last_accessed", true)
         .single();
 
-      if (userHome) {
+      if (loggedInHome) {
         return navigate("/home");
       }
     }

@@ -23,20 +23,26 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     return redirect("/signin");
   }
 
-  const { id: userId } = session.user;
   const { data: loggedInHome } = await supabase
-    .from("home_members")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("last_accessed", true)
+    .from("homes")
+    .select(`
+      *,
+      home_members (
+        last_accessed
+      )
+    `)
+    .eq("owner_id", session.user.id)
+    .eq("home_members.last_accessed", true)
     .single();
 
-  if (!loggedInHome) return redirect("/onboarding");
+  if (!loggedInHome) {
+    return json({ error: "User does not belong to a home" }, { status: 400 });
+  }
 
   const { data: recipes, error } = await supabase
     .from("recipes")
     .select("title, description, id")
-    .eq("belongs_to", loggedInHome.home_id);
+    .eq("belongs_to", loggedInHome.id);
   return error
     ? json({ error, recipes: null }, { status: 500 })
     : json({ error: null, recipes }, { status: 200 });
@@ -53,11 +59,17 @@ export async function action({ request, context }: ActionFunctionArgs) {
   }
 
   const { data: loggedInHome } = await supabase
-    .from("home_members")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .eq("last_accessed", true)
+    .from("homes")
+    .select(`
+      *,
+      home_members (
+        last_accessed
+      )
+    `)
+    .eq("owner_id", session.user.id)
+    .eq("home_members.last_accessed", true)
     .single();
+
 
   if (!loggedInHome) {
     return json({ error: "User does not belong to a home" }, { status: 400 });
@@ -69,7 +81,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const ingredientAmountPattern = /^ingredient-amount-\d+$/;
 
   const steps: string[] = [];
-  const ingredients: { name: string; amount: number }[] = [];
+  const ingredients: { name: string; amount: number, excludeFromGroceries: boolean }[] = [];
 
   for (const [key, value] of formData.entries()) {
     if (stepPattern.test(key)) {
@@ -87,6 +99,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
     }
   }
 
+  // TODO remove when logic is implemented
+  ingredients.forEach((ingredient) => {
+    ingredient.excludeFromGroceries = true
+  });
+
   const title = formData.get("title");
   const description = formData.get("description");
 
@@ -97,7 +114,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     ingredients,
     steps,
     created_by: session.user.id,
-    belongs_to: loggedInHome.home_id,
+    belongs_to: loggedInHome.id,
   });
 
   if (insertRecipeError) {
