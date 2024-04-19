@@ -11,7 +11,7 @@ import {
   redirect,
 } from "@remix-run/cloudflare";
 import { Form, useNavigation } from "@remix-run/react";
-import { Loader, ScrollText } from "lucide-react";
+import { ScrollText } from "lucide-react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const supabase = createClient(request, context);
@@ -80,9 +80,8 @@ export default function OnboardingPage() {
             <Input name="home-name" />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={state !== "idle"}>
-              {state !== "idle" && <Loader className="mr-1 h-4 animate-spin" />}Create
-              Home
+            <Button type="submit" loading={state !== "idle"}>
+              Create Home
             </Button>
           </CardFooter>
         </Card>

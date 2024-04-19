@@ -1,6 +1,6 @@
 import { breakpoints, useWindowWidth } from "@/hooks/useWindowWidth";
 import { cn } from "@/utils/cn";
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, Plus, Trash } from "lucide-react";
 import { nanoid } from "nanoid";
@@ -63,19 +63,13 @@ function TitleAndIngredients() {
             <Button
               variant="outline"
               className="w-fit"
-              type="button"
               onClick={() => removeIngredient(index)}
             >
               <Trash className="h-4" />
             </Button>
           </div>
         ))}
-        <Button
-          className="w-fit"
-          variant="outline"
-          onClick={addNewIngredient}
-          type="button"
-        >
+        <Button className="w-fit" variant="outline" onClick={addNewIngredient}>
           <Plus className="mr-1 h-4" /> Add ingredient
         </Button>
       </div>
@@ -131,18 +125,13 @@ function Steps() {
               value={step.text}
               onChange={(e) => handleStepChange(index, e.target.value)}
             />
-            <Button
-              variant="outline"
-              className="w-fit"
-              type="button"
-              onClick={() => removeStep(index)}
-            >
+            <Button variant="outline" className="w-fit" onClick={() => removeStep(index)}>
               <Trash className="h-4" />
             </Button>
           </Reorder.Item>
         ))}
       </Reorder.Group>
-      <Button className="w-fit" variant="outline" onClick={addNewStep} type="button">
+      <Button className="w-fit" variant="outline" onClick={addNewStep}>
         <Plus className="mr-1 h-4" /> Add step
       </Button>
     </>
@@ -174,7 +163,9 @@ export function RecipeForm() {
           />
           <ResizablePanel minSize={30} className="">
             <Steps />
-            <Button className="absolute right-4 bottom-4">Save Recipe</Button>
+            <Button className="absolute right-4 bottom-4" type="submit">
+              Save Recipe
+            </Button>
           </ResizablePanel>
         </ResizablePanelGroup>
       </Form>
