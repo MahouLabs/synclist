@@ -2,8 +2,7 @@ import { RecipeCard } from "@/components/recipe-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createId } from "@/utils/ids";
-import { createClient } from "@/utils/supabase.server";
-import type { Tables } from "@/utils/supabase.types";
+import { createClient, getLoggedInHome, getUserSession } from "@/utils/supabase.server";
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
@@ -46,24 +45,12 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const supabase = createClient(request, context);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
 
-  if (!session) {
-    return redirect("/signin");
-  }
+  const session = await getUserSession(supabase);
+  if (!session) return redirect("/signin");
 
-  const { data: loggedInHome } = await supabase
-    .from("home_members")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .eq("active", true)
-    .single();
-
-  if (!loggedInHome) {
-    return json({ error: "User does not belong to a home" }, { status: 400 });
-  }
+  const loggedInHome = await getLoggedInHome(supabase, session.user.id);
+  if (!loggedInHome) return redirect("/onboarding");
 
   const formData = await request.formData();
   const stepPattern = /^step-\d+$/;
@@ -91,48 +78,85 @@ export async function action({ request, context }: ActionFunctionArgs) {
     }
   }
 
-  // const items: Tables<"items">[] = ingredients.map((ingredient) => ({
-  //   id: createId("item"),
-  //   name: ingredient.name,
-  //   home_id: loggedInHome.home_id,
-  // }));
+  const { data } = await supabase
+    .from("items")
+    .select("id, name")
+    .eq("home_id", loggedInHome.home_id);
 
-  // const { error: insertItemsError, data: insertedItems } = await supabase
-  //   .from("items")
-  //   .insert(items)
-  //   .select();
+  const items = data || [];
 
-  // if (insertItemsError) {
-  //   return json({ error: insertItemsError }, { status: 500 });
-  // }
+  const normalizedItemsMap = new Map<string, string>();
+  for (const item of items) {
+    normalizedItemsMap.set(item.name.toLowerCase(), item.id);
+  }
 
-  // const { error: insertRecipeError, data: createdRecipe } = await supabase
-  //   .from("recipes")
-  //   .insert({
-  //     id: createId("recipe"),
-  //     title: String(title),
-  //     description: String(description),
-  //     steps,
-  //     home_id: loggedInHome.home_id,
-  //   })
-  //   .select("id")
-  //   .single();
+  const mergedData = ingredients.map((ingredient) => {
+    const ingredientNameLower = ingredient.name.toLowerCase();
+    const matchedId = normalizedItemsMap.get(ingredientNameLower);
+    return {
+      name: ingredient.name,
+      amount: ingredient.amount,
+      matchedId: matchedId || null,
+    };
+  });
 
-  // if (insertRecipeError) {
-  //   return json({ error: insertRecipeError }, { status: 500 });
-  // }
+  const unmatchedItems = mergedData.filter((item) => !item.matchedId);
 
-  // const { error, data } = await supabase.from("recipes_items").insert(
-  //   insertedItems.map((item) => ({
-  //     recipe_id: createdRecipe.id,
-  //     item_id: item.id,
-  //     amount:
-  //       ingredients.find((ingredient) => ingredient.name === item.name)?.amount || 1,
-  //   }))
-  // );
+  const { error: insertItemsError, data: insertedItems } = await supabase
+    .from("items")
+    .insert(
+      unmatchedItems.map((item) => ({
+        id: createId("item"),
+        name: item.name,
+        home_id: loggedInHome.home_id,
+      }))
+    )
+    .select("id, name");
 
-  // return redirect("/recipes");
-  return null;
+  if (insertItemsError) {
+    return json({ error: insertItemsError }, { status: 500 });
+  }
+
+  const finalItems = mergedData.map((item) => {
+    const matchedItem = insertedItems.find(
+      (insertedItem) => insertedItem.name === item.name
+    );
+
+    return {
+      id: matchedItem?.id || item.matchedId || "",
+      amount: item.amount,
+    };
+  });
+
+  const { error: insertRecipeError, data: createdRecipe } = await supabase
+    .from("recipes")
+    .insert({
+      id: createId("recipe"),
+      title: String(title),
+      description: String(description),
+      steps,
+      home_id: loggedInHome.home_id,
+    })
+    .select("id")
+    .single();
+
+  if (insertRecipeError) {
+    return json({ error: insertRecipeError }, { status: 500 });
+  }
+
+  const { error: insertRecipesItemsError } = await supabase.from("recipes_items").insert(
+    finalItems.map((item) => ({
+      recipe_id: createdRecipe.id,
+      item_id: item.id,
+      amount: item.amount,
+    }))
+  );
+
+  if (insertRecipesItemsError) {
+    return json({ error: insertRecipesItemsError }, { status: 500 });
+  }
+
+  return redirect("/recipes");
 }
 
 export default function RecipePage() {
