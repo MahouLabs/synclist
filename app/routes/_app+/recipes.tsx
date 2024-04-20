@@ -164,7 +164,7 @@ export default function RecipePage() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-4 lg:p-6">
       <div className="flex gap-4">
         <Input placeholder="Search..." onChange={handleSearch} />
         <Button asChild>
