@@ -39,7 +39,7 @@ export async function getLoggedInHome(
     .from("home_members")
     .select("*")
     .eq("user_id", userId)
-    .eq("last_accessed", true)
+    .eq("active", true)
     .single();
 
   return loggedInHome;

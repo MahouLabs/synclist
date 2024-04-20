@@ -14,11 +14,17 @@ import { createId } from "@/utils/ids";
 import { createClient, getLoggedInHome, getUserSession } from "@/utils/supabase.server";
 import type { Database } from "@/utils/supabase.types";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { redirect, useLoaderData, useRevalidator, useSubmit } from "@remix-run/react";
+import {
+  Form,
+  redirect,
+  useLoaderData,
+  useRevalidator,
+  useSubmit,
+} from "@remix-run/react";
 import { createBrowserClient } from "@supabase/ssr";
 import Fuse from "fuse.js";
 import { MinusIcon, PlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 
 type Grocery = { id: string; amount: number; bought: boolean; name: string };
 
@@ -231,7 +237,8 @@ export default function GroceriesPage() {
 
   const fuse = new Fuse(groceries, options);
 
-  const addNewItem = () => {
+  const addNewItem = (e: FormEvent) => {
+    e.preventDefault();
     if (!searchQuery) return;
     submit({ name: searchQuery, action: "add-item" }, { method: "post" });
     setSearchQuery("");
@@ -239,24 +246,24 @@ export default function GroceriesPage() {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="relative">
+      <Form className="relative" onSubmit={addNewItem}>
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           id="search-input"
           placeholder="Search or add item..."
         />
-        {/* <SearchIcon className="absolute top-2.5 right-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" /> */}
         <Button
           className="absolute top-0 right-0 h-10 w-10 rounded-md border-l-0"
           size="icon"
           variant="ghost"
-          onClick={addNewItem}
+          type="submit"
+          // onClick={addNewItem}
         >
           <PlusIcon className="h-4 w-4" />
           <span className="sr-only">Add item</span>
         </Button>
-      </div>
+      </Form>
 
       {unboughtItems.length === 0 && boughtItems.length === 0 && (
         <p>

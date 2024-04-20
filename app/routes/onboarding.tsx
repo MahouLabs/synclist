@@ -46,10 +46,6 @@ export async function action({ request, context }: ActionFunctionArgs) {
     id: homeId,
     owner_id: session.user.id,
     name: String(homeName),
-    // next sunday at midnight
-    schedule_reset_at: new Date(
-      new Date().setDate(new Date().getDate() + ((6 - new Date().getDay() + 7) % 7))
-    ).toISOString(),
   });
 
   if (createHomeError) return json({ error: createHomeError }, { status: 500 });
@@ -57,7 +53,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const { error: createHomeUserError } = await supabase.from("home_members").insert({
     home_id: homeId,
     user_id: session.user.id,
-    last_accessed: true,
+    active: true,
   });
 
   if (createHomeUserError) return json({ error: createHomeUserError }, { status: 500 });

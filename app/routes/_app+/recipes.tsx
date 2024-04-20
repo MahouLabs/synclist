@@ -29,7 +29,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     .from("home_members")
     .select("*")
     .eq("user_id", userId)
-    .eq("last_accessed", true)
+    .eq("active", true)
     .single();
 
   if (!loggedInHome) return redirect("/onboarding");
@@ -58,7 +58,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     .from("home_members")
     .select("*")
     .eq("user_id", session.user.id)
-    .eq("last_accessed", true)
+    .eq("active", true)
     .single();
 
   if (!loggedInHome) {
