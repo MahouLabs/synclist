@@ -20,6 +20,17 @@ export function Header({ homeName }: HeaderProps) {
   const { pathname } = useLocation();
   const subroute = pathname.slice(1).includes("/");
 
+  const recipeIdPattern = /^\/recipes\/recp_[A-Za-z0-9]+$/;
+
+  let title: string = pathTitles[pathname as keyof typeof pathTitles] || "SyncList";
+  if (pathname === "/recipes") {
+    title = "Recipes";
+  } else if (pathname === "/recipes/new") {
+    title = "New Recipe";
+  } else if (recipeIdPattern.test(pathname)) {
+    title = "Recipe";
+  }
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -92,7 +103,7 @@ export function Header({ homeName }: HeaderProps) {
           </Button>
         </Link>
       )}
-      <h3>{pathTitles[pathname as keyof typeof pathTitles]}</h3>
+      <h3>{title}</h3>
       {/* <div className="w-full flex-1">
   <form>
     <div className="relative">
