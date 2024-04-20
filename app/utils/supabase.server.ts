@@ -1,5 +1,6 @@
 import type { AppLoadContext } from "@remix-run/cloudflare";
 import { createServerClient, parse, serialize } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./supabase.types";
 
 export function createClient(request: Request, context: AppLoadContext) {
@@ -20,4 +21,26 @@ export function createClient(request: Request, context: AppLoadContext) {
       },
     },
   });
+}
+
+export async function getUserSession(supabase: SupabaseClient<Database>) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  return session;
+}
+
+export async function getLoggedInHome(
+  supabase: SupabaseClient<Database>,
+  userId: string
+) {
+  const { data: loggedInHome } = await supabase
+    .from("home_members")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("active", true)
+    .single();
+
+  return loggedInHome;
 }

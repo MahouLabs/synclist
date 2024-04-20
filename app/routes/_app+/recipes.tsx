@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createId } from "@/utils/ids";
 import { createClient } from "@/utils/supabase.server";
+import type { Tables } from "@/utils/supabase.types";
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
@@ -28,7 +29,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     .from("home_members")
     .select("*")
     .eq("user_id", userId)
-    .eq("last_accessed", true)
+    .eq("active", true)
     .single();
 
   if (!loggedInHome) return redirect("/onboarding");
@@ -36,7 +37,8 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   const { data: recipes, error } = await supabase
     .from("recipes")
     .select("title, description, id")
-    .eq("belongs_to", loggedInHome.home_id);
+    .eq("home_id", loggedInHome.home_id);
+
   return error
     ? json({ error, recipes: null }, { status: 500 })
     : json({ error: null, recipes }, { status: 200 });
@@ -56,7 +58,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     .from("home_members")
     .select("*")
     .eq("user_id", session.user.id)
-    .eq("last_accessed", true)
+    .eq("active", true)
     .single();
 
   if (!loggedInHome) {
@@ -68,6 +70,8 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const ingredientNamePattern = /^ingredient-name-\d+$/;
   const ingredientAmountPattern = /^ingredient-amount-\d+$/;
 
+  const title = formData.get("title");
+  const description = formData.get("description");
   const steps: string[] = [];
   const ingredients: { name: string; amount: number }[] = [];
 
@@ -87,24 +91,48 @@ export async function action({ request, context }: ActionFunctionArgs) {
     }
   }
 
-  const title = formData.get("title");
-  const description = formData.get("description");
+  // const items: Tables<"items">[] = ingredients.map((ingredient) => ({
+  //   id: createId("item"),
+  //   name: ingredient.name,
+  //   home_id: loggedInHome.home_id,
+  // }));
 
-  const { error: insertRecipeError } = await supabase.from("recipes").insert({
-    id: createId("recipe"),
-    title: String(title),
-    description: String(description),
-    ingredients,
-    steps,
-    created_by: session.user.id,
-    belongs_to: loggedInHome.home_id,
-  });
+  // const { error: insertItemsError, data: insertedItems } = await supabase
+  //   .from("items")
+  //   .insert(items)
+  //   .select();
 
-  if (insertRecipeError) {
-    return json({ error: insertRecipeError }, { status: 500 });
-  }
+  // if (insertItemsError) {
+  //   return json({ error: insertItemsError }, { status: 500 });
+  // }
 
-  return redirect("/recipes");
+  // const { error: insertRecipeError, data: createdRecipe } = await supabase
+  //   .from("recipes")
+  //   .insert({
+  //     id: createId("recipe"),
+  //     title: String(title),
+  //     description: String(description),
+  //     steps,
+  //     home_id: loggedInHome.home_id,
+  //   })
+  //   .select("id")
+  //   .single();
+
+  // if (insertRecipeError) {
+  //   return json({ error: insertRecipeError }, { status: 500 });
+  // }
+
+  // const { error, data } = await supabase.from("recipes_items").insert(
+  //   insertedItems.map((item) => ({
+  //     recipe_id: createdRecipe.id,
+  //     item_id: item.id,
+  //     amount:
+  //       ingredients.find((ingredient) => ingredient.name === item.name)?.amount || 1,
+  //   }))
+  // );
+
+  // return redirect("/recipes");
+  return null;
 }
 
 export default function RecipePage() {

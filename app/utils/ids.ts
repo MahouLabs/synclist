@@ -6,6 +6,8 @@ export const nanoid = customAlphabet(
 const prefixes = {
   home: "home",
   recipe: "recp",
+  schedule: "schd",
+  item: "item",
 } as const;
 
 export const createId = (prefix: keyof typeof prefixes) =>
