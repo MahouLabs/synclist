@@ -1,10 +1,4 @@
-import { createClient } from "@/utils/supabase.server";
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  redirect,
-} from "@remix-run/cloudflare";
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { useNavigation } from "@remix-run/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,36 +11,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { breakpoints, useWindowWidth } from "@/hooks/useWindowWidth";
 import { cn } from "@/utils/cn";
-import type { Tables } from "@/utils/supabase.types";
 import { Form } from "@remix-run/react";
 import { Reorder, useDragControls } from "framer-motion";
 import { GripVertical, Plus, Trash } from "lucide-react";
 import { nanoid } from "nanoid";
 import { useState } from "react";
-
-type Item = Omit<Tables<"items">, "home_id">;
-
-export async function loader({ request, context }: LoaderFunctionArgs) {
-  const supabase = createClient(request, context);
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return redirect("/signin");
-  }
-
-  const { data: items } = await supabase.from("items").select("id, name");
-  return { items };
-}
-
-export async function action({ request, context }: ActionFunctionArgs) {
-  const supabase = createClient(request, context);
-
-  const body = await request.formData();
-  return null;
-}
 
 function CookingStep({
   step,
@@ -108,7 +77,6 @@ function Steps() {
   };
 
   return (
-    // <div className="h-full flex-grow-0">
     <ScrollArea className="lg:-mb-[84px] h-full w-full">
       <Reorder.Group
         axis="y"
@@ -131,28 +99,24 @@ function Steps() {
         <Plus className="mr-1 h-4" /> Add step
       </Button>
     </ScrollArea>
-    // </div>
   );
 }
 
-function TitleAndIngredients({ items }: { items: Item[] }) {
-  const submit = useSubmit();
-  // const [items, setItems] = useState<{ name: string; amount: number }[]>([
-  //   { name: "", amount: 0 },
-  // ]);
+function TitleAndIngredients() {
+  const [ingredients, setIngredients] = useState<{ name: string; amount: number }[]>([]);
 
   const addNewIngredient = () => {
-    setItems((prev) => [...prev, { name: "", amount: 0 }]);
+    setIngredients((prev) => [...prev, { name: "", amount: 1 }]);
   };
 
   const removeIngredient = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
+    setIngredients((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleIngredientChange = (index: number, name: string, amount: number) => {
-    const newIngredients = [...items];
+    const newIngredients = [...ingredients];
     newIngredients[index] = { name, amount };
-    setItems(newIngredients);
+    setIngredients(newIngredients);
   };
 
   return (
@@ -168,7 +132,7 @@ function TitleAndIngredients({ items }: { items: Item[] }) {
       </div>
       <div className="flex flex-col gap-4">
         <h3 className="mt-4 mb-2">Ingredients</h3>
-        {items.map((ingredient, index) => (
+        {ingredients.map((ingredient, index) => (
           <div key={`ingredient-${index + 1}`} className="flex gap-4">
             <Input
               className="basis-2/3"
@@ -182,6 +146,8 @@ function TitleAndIngredients({ items }: { items: Item[] }) {
             <Input
               className="basis-1/3"
               type="number"
+              min={1}
+              defaultValue={1}
               name={`ingredient-amount-${index + 1}`}
               placeholder="Amount"
             />
@@ -203,40 +169,44 @@ function TitleAndIngredients({ items }: { items: Item[] }) {
 }
 
 export default function NewRecipePage() {
-  const { items } = useLoaderData<typeof loader>();
   const width = useWindowWidth();
   const mobileLayout = width < breakpoints.xl;
-
-  // TODO show toast or error message somwhere using data.error
-  // by now, thats enough to stop redirecting
+  const navigation = useNavigation();
 
   return (
     <div className="flex h-full flex-col">
-      <Form className="h-full grow" method="POST" navigate={false} action="/recipes">
-        <ResizablePanelGroup
-          direction={mobileLayout ? "vertical" : "horizontal"}
-          className="hidden"
-        >
-          <ResizablePanel minSize={mobileLayout ? 0 : 30} className="p-4 lg:p-6">
-            <TitleAndIngredients items={items} />
-          </ResizablePanel>
-          <ResizableHandle
-            withHandle
-            className={cn({
-              "mx-4": !mobileLayout,
-              "my-4": mobileLayout,
-            })}
-          />
-          <ResizablePanel minSize={mobileLayout ? 0 : 30} className="p-4 lg:p-6">
-            <Steps />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+      <Form
+        className="flex grow flex-col"
+        method="POST"
+        navigate={false}
+        action="/recipes"
+      >
+        <div className="h-full grow">
+          <ResizablePanelGroup
+            direction={mobileLayout ? "vertical" : "horizontal"}
+            className="hidden"
+          >
+            <ResizablePanel minSize={mobileLayout ? 0 : 30} className="p-4 lg:p-6">
+              <TitleAndIngredients />
+            </ResizablePanel>
+            <ResizableHandle
+              withHandle
+              className={cn({
+                "mx-4": !mobileLayout,
+                "my-4": mobileLayout,
+              })}
+            />
+            <ResizablePanel minSize={mobileLayout ? 0 : 30} className="p-4 lg:p-6">
+              <Steps />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+        <footer className="flex justify-center border-t p-2">
+          <Button className="ml-auto" type="submit" loading={navigation.state !== "idle"}>
+            Save Recipe
+          </Button>
+        </footer>
       </Form>
-      <footer className="flex justify-center border-t p-2">
-        <Button className="ml-auto" type="submit">
-          Save Recipe
-        </Button>
-      </footer>
     </div>
   );
 }
