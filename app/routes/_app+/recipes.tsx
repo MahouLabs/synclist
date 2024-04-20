@@ -159,7 +159,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   return redirect("/recipes");
 }
 
-export default function RecipePage() {
+export default function RecipesPage() {
   const { error, recipes } = useLoaderData<typeof loader>();
   const [searchResults, setSearchResults] = useState<typeof recipes>(recipes);
 
