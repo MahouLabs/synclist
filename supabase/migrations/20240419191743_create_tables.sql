@@ -1,3 +1,19 @@
+create table "public"."homes" (
+    "id" character varying not null,
+    "name" text not null,
+    "owner_id" uuid not null default auth.uid()
+);
+
+alter table "public"."homes" enable row level security;
+
+create table "public"."home_members" (
+    "home_id" character varying not null,
+    "user_id" uuid not null,
+    "active" boolean not null default false
+);
+
+alter table "public"."home_members" enable row level security;
+
 create table "public"."groceries" (
     "home_id" character varying not null,
     "item_id" character varying not null,
@@ -5,56 +21,32 @@ create table "public"."groceries" (
     "bought" boolean not null default false
 );
 
-
 alter table "public"."groceries" enable row level security;
-
-create table "public"."home_members" (
-    "home_id" character varying not null,
-    "user_id" uuid not null,
-    "last_accessed" boolean not null default false
-);
-
-
-alter table "public"."home_members" enable row level security;
-
-create table "public"."homes" (
-    "id" character varying not null,
-    "name" text not null,
-    "owner_id" uuid not null default auth.uid(),
-    "created_at" timestamp with time zone not null default now(),
-    "schedule_created_at" timestamp with time zone not null default now(),
-    "schedule_reset_at" timestamp with time zone not null
-);
-
-
-alter table "public"."homes" enable row level security;
 
 create table "public"."items" (
     "id" character varying not null,
-    "name" text not null,
-    "home_id" character varying not null
+    "home_id" character varying not null,
+    "name" text not null
 );
-
 
 alter table "public"."items" enable row level security;
 
 create table "public"."recipes" (
     "id" character varying not null ,
+    "home_id" character varying not null,
     "title" text not null,
     "description" text,
     "steps" jsonb[] not null default '{}'::jsonb[],
-    "home_id" character varying
+    "servings" smallint not null default 0
 );
-
 
 alter table "public"."recipes" enable row level security;
 
 create table "public"."recipes_items" (
-    "item_id" character varying not null,
     "recipe_id" character varying not null,
+    "item_id" character varying not null,
     "amount" smallint not null
 );
-
 
 alter table "public"."recipes_items" enable row level security;
 
@@ -63,17 +55,7 @@ create table "public"."recipes_tags" (
     "recipe_id" character varying not null
 );
 
-
 alter table "public"."recipes_tags" enable row level security;
-
-create table "public"."schedules_recipes" (
-    "home_id" character varying not null,
-    "recipe_id" character varying not null,
-    "servings" smallint not null default '1'::smallint
-);
-
-
-alter table "public"."schedules_recipes" enable row level security;
 
 create table "public"."tags" (
     "id" character varying not null,
@@ -81,7 +63,6 @@ create table "public"."tags" (
     "name" text not null,
     "color" character varying not null
 );
-
 
 alter table "public"."tags" enable row level security;
 
@@ -93,13 +74,13 @@ CREATE UNIQUE INDEX homes_pkey ON public.homes USING btree (id);
 
 CREATE UNIQUE INDEX items_pkey ON public.items USING btree (id);
 
+CREATE UNIQUE index items_name_home_id_key ON public.items (name, home_id);
+
 CREATE UNIQUE INDEX recipe_items_pkey ON public.recipes_items USING btree (item_id, recipe_id);
 
 CREATE UNIQUE INDEX recipes_pkey ON public.recipes USING btree (id);
 
 CREATE UNIQUE INDEX recipes_tags_pkey ON public.recipes_tags USING btree (tag_id, recipe_id);
-
-CREATE UNIQUE INDEX schedules_recipes_pkey ON public.schedules_recipes USING btree (home_id, recipe_id);
 
 CREATE UNIQUE INDEX tags_pkey ON public.tags USING btree (id);
 
@@ -116,8 +97,6 @@ alter table "public"."recipes" add constraint "recipes_pkey" PRIMARY KEY using i
 alter table "public"."recipes_items" add constraint "recipe_items_pkey" PRIMARY KEY using index "recipe_items_pkey";
 
 alter table "public"."recipes_tags" add constraint "recipes_tags_pkey" PRIMARY KEY using index "recipes_tags_pkey";
-
-alter table "public"."schedules_recipes" add constraint "schedules_recipes_pkey" PRIMARY KEY using index "schedules_recipes_pkey";
 
 alter table "public"."tags" add constraint "tags_pkey" PRIMARY KEY using index "tags_pkey";
 
@@ -164,14 +143,6 @@ alter table "public"."recipes_tags" validate constraint "public_recipes_tags_rec
 alter table "public"."recipes_tags" add constraint "public_recipes_tags_tag_id_fkey" FOREIGN KEY (tag_id) REFERENCES tags(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
 alter table "public"."recipes_tags" validate constraint "public_recipes_tags_tag_id_fkey";
-
-alter table "public"."schedules_recipes" add constraint "public_schedules_recipes_recipe_id_fkey" FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
-
-alter table "public"."schedules_recipes" validate constraint "public_schedules_recipes_recipe_id_fkey";
-
-alter table "public"."schedules_recipes" add constraint "public_schedules_recipes_home_id_fkey" FOREIGN KEY (home_id) REFERENCES homes(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
-
-alter table "public"."schedules_recipes" validate constraint "public_schedules_recipes_home_id_fkey";
 
 alter table "public"."tags" add constraint "public_tags_home_id_fkey" FOREIGN KEY (home_id) REFERENCES homes(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
@@ -470,48 +441,6 @@ grant trigger on table "public"."recipes_tags" to "service_role";
 grant truncate on table "public"."recipes_tags" to "service_role";
 
 grant update on table "public"."recipes_tags" to "service_role";
-
-grant delete on table "public"."schedules_recipes" to "anon";
-
-grant insert on table "public"."schedules_recipes" to "anon";
-
-grant references on table "public"."schedules_recipes" to "anon";
-
-grant select on table "public"."schedules_recipes" to "anon";
-
-grant trigger on table "public"."schedules_recipes" to "anon";
-
-grant truncate on table "public"."schedules_recipes" to "anon";
-
-grant update on table "public"."schedules_recipes" to "anon";
-
-grant delete on table "public"."schedules_recipes" to "authenticated";
-
-grant insert on table "public"."schedules_recipes" to "authenticated";
-
-grant references on table "public"."schedules_recipes" to "authenticated";
-
-grant select on table "public"."schedules_recipes" to "authenticated";
-
-grant trigger on table "public"."schedules_recipes" to "authenticated";
-
-grant truncate on table "public"."schedules_recipes" to "authenticated";
-
-grant update on table "public"."schedules_recipes" to "authenticated";
-
-grant delete on table "public"."schedules_recipes" to "service_role";
-
-grant insert on table "public"."schedules_recipes" to "service_role";
-
-grant references on table "public"."schedules_recipes" to "service_role";
-
-grant select on table "public"."schedules_recipes" to "service_role";
-
-grant trigger on table "public"."schedules_recipes" to "service_role";
-
-grant truncate on table "public"."schedules_recipes" to "service_role";
-
-grant update on table "public"."schedules_recipes" to "service_role";
 
 grant delete on table "public"."tags" to "anon";
 
