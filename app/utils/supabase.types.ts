@@ -47,18 +47,18 @@ export type Database = {
       }
       home_members: {
         Row: {
+          active: boolean
           home_id: string
-          last_accessed: boolean
           user_id: string
         }
         Insert: {
+          active?: boolean
           home_id: string
-          last_accessed?: boolean
           user_id: string
         }
         Update: {
+          active?: boolean
           home_id?: string
-          last_accessed?: boolean
           user_id?: string
         }
         Relationships: [
@@ -80,28 +80,19 @@ export type Database = {
       }
       homes: {
         Row: {
-          created_at: string
           id: string
           name: string
           owner_id: string
-          schedule_created_at: string
-          schedule_reset_at: string
         }
         Insert: {
-          created_at?: string
           id: string
           name: string
           owner_id?: string
-          schedule_created_at?: string
-          schedule_reset_at: string
         }
         Update: {
-          created_at?: string
           id?: string
           name?: string
           owner_id?: string
-          schedule_created_at?: string
-          schedule_reset_at?: string
         }
         Relationships: [
           {
@@ -142,22 +133,25 @@ export type Database = {
       recipes: {
         Row: {
           description: string | null
-          home_id: string | null
+          home_id: string
           id: string
+          servings: number
           steps: Json[]
           title: string
         }
         Insert: {
           description?: string | null
-          home_id?: string | null
+          home_id: string
           id: string
+          servings?: number
           steps?: Json[]
           title: string
         }
         Update: {
           description?: string | null
-          home_id?: string | null
+          home_id?: string
           id?: string
+          servings?: number
           steps?: Json[]
           title?: string
         }
@@ -230,39 +224,6 @@ export type Database = {
             columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      schedules_recipes: {
-        Row: {
-          home_id: string
-          recipe_id: string
-          servings: number
-        }
-        Insert: {
-          home_id: string
-          recipe_id: string
-          servings?: number
-        }
-        Update: {
-          home_id?: string
-          recipe_id?: string
-          servings?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_schedules_recipes_home_id_fkey"
-            columns: ["home_id"]
-            isOneToOne: false
-            referencedRelation: "homes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_schedules_recipes_recipe_id_fkey"
-            columns: ["recipe_id"]
-            isOneToOne: false
-            referencedRelation: "recipes"
             referencedColumns: ["id"]
           },
         ]
