@@ -59,7 +59,6 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
-  console.log(request);
   const supabase = createClient(request, context);
   const formData = await request.formData();
   const action = formData.get("action");
@@ -258,7 +257,6 @@ export default function GroceriesPage() {
           size="icon"
           variant="ghost"
           type="submit"
-          // onClick={addNewItem}
         >
           <PlusIcon className="h-4 w-4" />
           <span className="sr-only">Add item</span>

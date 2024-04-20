@@ -91,36 +91,36 @@ export async function action({ request, context }: ActionFunctionArgs) {
     }
   }
 
-  const items: Tables<"items">[] = ingredients.map((ingredient) => ({
-    id: createId("item"),
-    name: ingredient.name,
-    home_id: loggedInHome.home_id,
-  }));
+  // const items: Tables<"items">[] = ingredients.map((ingredient) => ({
+  //   id: createId("item"),
+  //   name: ingredient.name,
+  //   home_id: loggedInHome.home_id,
+  // }));
 
-  const { error: insertItemsError, data: insertedItems } = await supabase
-    .from("items")
-    .insert(items)
-    .select();
+  // const { error: insertItemsError, data: insertedItems } = await supabase
+  //   .from("items")
+  //   .insert(items)
+  //   .select();
 
-  if (insertItemsError) {
-    return json({ error: insertItemsError }, { status: 500 });
-  }
+  // if (insertItemsError) {
+  //   return json({ error: insertItemsError }, { status: 500 });
+  // }
 
-  const { error: insertRecipeError, data: createdRecipe } = await supabase
-    .from("recipes")
-    .insert({
-      id: createId("recipe"),
-      title: String(title),
-      description: String(description),
-      steps,
-      home_id: loggedInHome.home_id,
-    })
-    .select("id")
-    .single();
+  // const { error: insertRecipeError, data: createdRecipe } = await supabase
+  //   .from("recipes")
+  //   .insert({
+  //     id: createId("recipe"),
+  //     title: String(title),
+  //     description: String(description),
+  //     steps,
+  //     home_id: loggedInHome.home_id,
+  //   })
+  //   .select("id")
+  //   .single();
 
-  if (insertRecipeError) {
-    return json({ error: insertRecipeError }, { status: 500 });
-  }
+  // if (insertRecipeError) {
+  //   return json({ error: insertRecipeError }, { status: 500 });
+  // }
 
   // const { error, data } = await supabase.from("recipes_items").insert(
   //   insertedItems.map((item) => ({
@@ -130,8 +130,6 @@ export async function action({ request, context }: ActionFunctionArgs) {
   //       ingredients.find((ingredient) => ingredient.name === item.name)?.amount || 1,
   //   }))
   // );
-
-  // console.log({ error, data });
 
   // return redirect("/recipes");
   return null;

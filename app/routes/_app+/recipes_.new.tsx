@@ -26,7 +26,6 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const supabase = createClient(request, context);
 
   const body = await request.formData();
-  console.log(body.get("item"));
   return null;
 }
 

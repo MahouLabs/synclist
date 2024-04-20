@@ -148,8 +148,6 @@ function Steps() {
 export function RecipeForm({ ingredients }: RecipeFormProps) {
   const width = useWindowWidth();
 
-  console.log({ ingredients });
-
   // TODO show toast or error message somwhere using data.error
   // by now, thats enough to stop redirecting
 
