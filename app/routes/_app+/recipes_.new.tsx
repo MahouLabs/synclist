@@ -26,9 +26,93 @@ import { useState } from "react";
 
 type Ingredient = Omit<Tables<"items">, "home_id">;
 
-type RecipeFormProps = {
-  ingredients: Ingredient[];
-};
+export async function loader({ request, context }: LoaderFunctionArgs) {
+  const supabase = createClient(request, context);
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return redirect("/signin");
+  }
+
+  const { data: items } = await supabase.from("items").select("id, name");
+  return { items };
+}
+
+export async function action({ request, context }: ActionFunctionArgs) {
+  const supabase = createClient(request, context);
+
+  const body = await request.formData();
+  return null;
+}
+
+function Steps() {
+  const dragControls = useDragControls();
+  const [steps, setSteps] = useState([{ id: nanoid(5), text: "" }]);
+
+  const addNewStep = () => {
+    setSteps((prev) => [...prev, { id: nanoid(5), text: "" }]);
+  };
+
+  const removeStep = (index: number) => {
+    setSteps((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleStepChange = (index: number, step: string) => {
+    const newSteps = [...steps];
+    newSteps[index] = { ...steps[index], text: step };
+    setSteps(newSteps);
+  };
+
+  return (
+    <div className="h-full flex-grow-0">
+      <ScrollArea className="lg:-mb-[84px] h-full w-full">
+        <Reorder.Group
+          axis="y"
+          values={steps}
+          onReorder={setSteps}
+          className="relative mb-4 flex flex-col gap-4 px-1"
+        >
+          <h3 className="mb-2">Cooking Steps</h3>
+          {steps.map((step, index) => (
+            <Reorder.Item
+              key={step.id}
+              id={step.id}
+              className="flex gap-4"
+              value={step.id}
+              dragListener={false}
+              dragControls={dragControls}
+            >
+              <GripVertical
+                className="cursor-grab self-center"
+                onPointerDown={(e) => dragControls.start(e)}
+              />
+              <Textarea
+                className="flex-1"
+                name={`step-${index + 1}`}
+                placeholder={`Step ${index + 1}`}
+                value={step.text}
+                onChange={(e) => handleStepChange(index, e.target.value)}
+              />
+              <Button
+                variant="outline"
+                className="w-fit"
+                onClick={() => removeStep(index)}
+              >
+                <Trash className="h-4" />
+              </Button>
+            </Reorder.Item>
+          ))}
+        </Reorder.Group>
+        <Button className="w-fit" variant="outline" onClick={addNewStep}>
+          <Plus className="mr-1 h-4" /> Add step
+        </Button>
+      </ScrollArea>
+    </div>
+  );
+}
 
 function TitleAndIngredients({ ingredients }: { ingredients: Ingredient[] }) {
   const [items, setItems] = useState<{ name: string; amount: number }[]>([
@@ -52,7 +136,7 @@ function TitleAndIngredients({ ingredients }: { ingredients: Ingredient[] }) {
   return (
     <>
       <div className="flex flex-col gap-4">
-        <h3 className="mb-2">Recipe title and description</h3>
+        <h3 className="mb-2 truncate">Recipe title and description</h3>
         <div>
           <Input name="title" placeholder="Title" />
         </div>
@@ -96,94 +180,6 @@ function TitleAndIngredients({ ingredients }: { ingredients: Ingredient[] }) {
   );
 }
 
-function Steps() {
-  const dragControls = useDragControls();
-  const [steps, setSteps] = useState([{ id: nanoid(5), text: "" }]);
-
-  const addNewStep = () => {
-    setSteps((prev) => [...prev, { id: nanoid(5), text: "" }]);
-  };
-
-  const removeStep = (index: number) => {
-    setSteps((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleStepChange = (index: number, step: string) => {
-    const newSteps = [...steps];
-    newSteps[index] = { ...steps[index], text: step };
-    setSteps(newSteps);
-  };
-
-  return (
-    <>
-      <ScrollArea>
-        <Reorder.Group
-          axis="y"
-          values={steps}
-          onReorder={setSteps}
-          className="relative mb-4 flex flex-col gap-4 px-1"
-        >
-          <h3 className="mb-2">Cooking Steps</h3>
-          {steps.map((step, index) => (
-            <Reorder.Item
-              key={step.id}
-              id={step.id}
-              className="flex gap-4"
-              value={step.id}
-              dragListener={false}
-              dragControls={dragControls}
-            >
-              <GripVertical
-                className="cursor-grab self-center"
-                onPointerDown={(e) => dragControls.start(e)}
-              />
-              <Textarea
-                className="flex-1"
-                name={`step-${index + 1}`}
-                placeholder={`Step ${index + 1}`}
-                value={step.text}
-                onChange={(e) => handleStepChange(index, e.target.value)}
-              />
-              <Button
-                variant="outline"
-                className="w-fit"
-                onClick={() => removeStep(index)}
-              >
-                <Trash className="h-4" />
-              </Button>
-            </Reorder.Item>
-          ))}
-        </Reorder.Group>
-      </ScrollArea>
-      <Button className="w-fit" variant="outline" onClick={addNewStep}>
-        <Plus className="mr-1 h-4" /> Add step
-      </Button>
-    </>
-  );
-}
-
-export async function loader({ request, context }: LoaderFunctionArgs) {
-  const supabase = createClient(request, context);
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return redirect("/signin");
-  }
-
-  const { data: items } = await supabase.from("items").select("id, name");
-  return { items };
-}
-
-export async function action({ request, context }: ActionFunctionArgs) {
-  const supabase = createClient(request, context);
-
-  const body = await request.formData();
-  return null;
-}
-
 export default function NewRecipePage() {
   const { items } = useLoaderData<typeof loader>();
   const width = useWindowWidth();
@@ -193,13 +189,13 @@ export default function NewRecipePage() {
   // by now, thats enough to stop redirecting
 
   return (
-    <>
-      <Form className="h-full" method="POST" navigate={false} action="/recipes">
+    <div className="flex h-full flex-col">
+      <Form className="h-full grow" method="POST" navigate={false} action="/recipes">
         <ResizablePanelGroup
           direction={mobileLayout ? "vertical" : "horizontal"}
           className="hidden"
         >
-          <ResizablePanel minSize={mobileLayout ? 0 : 30} className="px-1">
+          <ResizablePanel minSize={mobileLayout ? 0 : 30} className="p-4 lg:p-6">
             <TitleAndIngredients ingredients={items} />
           </ResizablePanel>
           <ResizableHandle
@@ -209,14 +205,16 @@ export default function NewRecipePage() {
               "my-4": mobileLayout,
             })}
           />
-          <ResizablePanel minSize={mobileLayout ? 0 : 30} className="">
+          <ResizablePanel minSize={mobileLayout ? 0 : 30} className="p-4 lg:p-6">
             <Steps />
-            <Button className="absolute right-4 bottom-4" type="submit">
-              Save Recipe
-            </Button>
           </ResizablePanel>
         </ResizablePanelGroup>
       </Form>
-    </>
+      <footer className="flex justify-center border-t p-2">
+        <Button className="ml-auto" type="submit">
+          Save Recipe
+        </Button>
+      </footer>
+    </div>
   );
 }

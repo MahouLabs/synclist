@@ -257,7 +257,7 @@ export default function GroceriesPage() {
   };
 
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-4 p-4 lg:p-6">
       <Form className="relative" onSubmit={addNewItem}>
         <Input
           value={searchQuery}

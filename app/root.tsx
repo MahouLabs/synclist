@@ -19,7 +19,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="dark">
-        <ScreenSize />
+        {/* <ScreenSize /> */}
         {children}
         <ScrollRestoration />
         <Scripts />
