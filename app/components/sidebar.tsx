@@ -28,7 +28,7 @@ export function Sidebar({ homeName }: SidebarProps) {
           <nav className="grid items-start px-2 font-medium text-sm lg:px-4">
             <Link
               to="/home"
-              prefetch="viewport"
+              prefetch="intent"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                 {
@@ -41,7 +41,7 @@ export function Sidebar({ homeName }: SidebarProps) {
             </Link>
             <Link
               to="/groceries"
-              prefetch="viewport"
+              prefetch="intent"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                 {
@@ -54,7 +54,7 @@ export function Sidebar({ homeName }: SidebarProps) {
             </Link>
             <Link
               to="/recipes"
-              prefetch="viewport"
+              prefetch="intent"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                 {
@@ -71,7 +71,7 @@ export function Sidebar({ homeName }: SidebarProps) {
           {homeName && (
             <Link
               to="/home"
-              prefetch="viewport"
+              prefetch="intent"
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
                 {
