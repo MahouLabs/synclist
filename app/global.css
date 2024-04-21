@@ -95,7 +95,7 @@
   }
 
   p {
-    @apply leading-7 text-pretty;
+    @apply leading-7 text-balance;
   }
 
   blockquote {
@@ -111,7 +111,5 @@
   body {
     font-family: "Inter", sans-serif;
     min-height: 100dvh;
-    max-height: 100dvh;
-    overflow-y: clip;
   }
 }
