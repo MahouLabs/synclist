@@ -1,9 +1,22 @@
 import { Toaster } from "@/components/ui/sonner";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
-import { ScreenSize } from "./components/screen";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, json } from "@remix-run/react";
 import "./global.css";
+import { getHints, useHints } from "./utils/client-hints";
+import { cn } from "./utils/cn";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  return json({
+    requestInfo: {
+      hints: getHints(request),
+    },
+  });
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const hints = useHints();
+  const theme = hints.theme || "dark";
+
   return (
     <html lang="en">
       <head>
@@ -18,7 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="dark">
+      <body className={cn(theme)}>
         {/* <ScreenSize /> */}
         {children}
         <ScrollRestoration />
