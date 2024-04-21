@@ -13,8 +13,12 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   }
 
   const { id: userId } = session.user;
-  const { data } = await supabase.from("home_members").select("*").eq('user_id', userId).eq("active", true).single();
-
+  const { data } = await supabase
+    .from("home_members")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("active", true)
+    .single();
 
   return json({ home: data }, { headers: { "Cache-Control": "max-age=3600, public" } });
 }
@@ -23,7 +27,7 @@ export default function HomePage() {
   const { home } = useLoaderData<typeof loader>();
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 p-4 lg:p-6">
       <h1>Home</h1>
     </div>
   );

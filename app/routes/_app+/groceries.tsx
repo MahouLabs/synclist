@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/utils/cn";
 import { createId } from "@/utils/ids";
 import { createClient, getLoggedInHome, getUserSession } from "@/utils/supabase.server";
 import type { Database } from "@/utils/supabase.types";
@@ -18,6 +19,7 @@ import {
   Form,
   redirect,
   useLoaderData,
+  useNavigation,
   useRevalidator,
   useSubmit,
 } from "@remix-run/react";
@@ -136,7 +138,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   return null;
 }
 
-function GroceryTableRow({ grocery }: { grocery: Grocery }) {
+function GroceryTableRow({ grocery, disabled }: { grocery: Grocery; disabled: boolean }) {
   const submit = useSubmit();
 
   const addAmount = () => {
@@ -161,9 +163,10 @@ function GroceryTableRow({ grocery }: { grocery: Grocery }) {
   };
 
   return (
-    <TableRow>
+    <TableRow className={cn(disabled && "bg-muted")}>
       <TableCell className="w-1/12">
         <Checkbox
+          disabled={disabled}
           name={grocery.name}
           id={grocery.name}
           checked={grocery.bought}
@@ -171,16 +174,22 @@ function GroceryTableRow({ grocery }: { grocery: Grocery }) {
         />
       </TableCell>
       <TableCell className="w-9/12">
-        <Label className={grocery.bought ? "line-through" : ""} htmlFor={grocery.name}>
+        <Label
+          className={cn(
+            grocery.bought ? "line-through" : "",
+            disabled ? "cursor-not-allowed" : "cursor-pointer"
+          )}
+          htmlFor={grocery.name}
+        >
           {grocery.name}
         </Label>
       </TableCell>
       <TableCell className="flex items-center gap-2">
-        <Button size="xs" variant="outline" onClick={addAmount}>
+        <Button size="xs" disabled={disabled} variant="outline" onClick={addAmount}>
           <PlusIcon className="h-4" />
         </Button>
         <span className="w-7 text-center">{grocery.amount}</span>
-        <Button size="xs" variant="outline" onClick={removeAmount}>
+        <Button size="xs" disabled={disabled} variant="outline" onClick={removeAmount}>
           <MinusIcon className="h-4" />
         </Button>
       </TableCell>
@@ -194,6 +203,7 @@ export default function GroceriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Grocery[]>(groceries || []);
   const revalidator = useRevalidator();
+  const navigation = useNavigation();
   const submit = useSubmit();
 
   useEffect(() => {
@@ -239,12 +249,15 @@ export default function GroceriesPage() {
   const addNewItem = (e: FormEvent) => {
     e.preventDefault();
     if (!searchQuery) return;
-    submit({ name: searchQuery, action: "add-item" }, { method: "post" });
+    submit(
+      { name: searchQuery, action: "add-item" },
+      { method: "post", fetcherKey: "groceries" }
+    );
     setSearchQuery("");
   };
 
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-4 p-4 lg:p-6">
       <Form className="relative" onSubmit={addNewItem}>
         <Input
           value={searchQuery}
@@ -284,12 +297,20 @@ export default function GroceriesPage() {
               {unboughtItems
                 .sort((a, b) => a.name.localeCompare(b.name))
                 ?.map((grocery, index) => (
-                  <GroceryTableRow key={grocery.name} grocery={grocery} />
+                  <GroceryTableRow
+                    key={grocery.name}
+                    grocery={grocery}
+                    disabled={navigation.state !== "idle"}
+                  />
                 ))}
               {boughtItems
                 .sort((a, b) => a.name.localeCompare(b.name))
                 ?.map((grocery, index) => (
-                  <GroceryTableRow key={grocery.name} grocery={grocery} />
+                  <GroceryTableRow
+                    key={grocery.name}
+                    grocery={grocery}
+                    disabled={navigation.state !== "idle"}
+                  />
                 ))}
             </TableBody>
           </Table>
