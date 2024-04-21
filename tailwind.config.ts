@@ -82,6 +82,7 @@ const config = {
 
 export default config;
 
+// biome-ignore lint/suspicious/noExplicitAny: yep.
 function addVariablesForColors({ addBase, theme }: any) {
   const allColors = flattenColorPalette(theme("colors"));
   const newVars = Object.fromEntries(

@@ -3,7 +3,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Separator } from "@/components/ui/separator";
 import { breakpoints, useWindowWidth } from "@/hooks/useWindowWidth";
 import { cn } from "@/utils/cn";
 import { createClient } from "@/utils/supabase.server";
