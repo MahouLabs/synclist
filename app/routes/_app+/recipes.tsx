@@ -8,34 +8,29 @@ import {
   type LoaderFunctionArgs,
   json,
 } from "@remix-run/cloudflare";
-import { Link, redirect, useLoaderData } from "@remix-run/react";
+import {
+  Link,
+  redirect,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from "@remix-run/react";
 import Fuse from "fuse.js";
-import { PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { MinusIcon, PlusIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const supabase = createClient(request, context);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
 
-  if (!session) {
-    return redirect("/signin");
-  }
+  const session = await getUserSession(supabase);
+  if (!session) return redirect("/signin");
 
-  const { id: userId } = session.user;
-  const { data: loggedInHome } = await supabase
-    .from("home_members")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("active", true)
-    .single();
-
+  const loggedInHome = await getLoggedInHome(supabase, session.user.id);
   if (!loggedInHome) return redirect("/onboarding");
 
   const { data: recipes, error } = await supabase
     .from("recipes")
-    .select("title, description, id")
+    .select("title, description, id, servings")
     .eq("home_id", loggedInHome.home_id);
 
   return error
@@ -53,14 +48,57 @@ export async function action({ request, context }: ActionFunctionArgs) {
   if (!loggedInHome) return redirect("/onboarding");
 
   const formData = await request.formData();
+  const action = formData.get("action");
+
+  if (action === "add-serving" || action === "remove-serving") {
+    const recipeId = String(formData.get("recipeId"));
+    const currentServings = Number(formData.get("servings")) || 0;
+    const newServings =
+      action === "add-serving" ? currentServings + 1 : currentServings - 1;
+
+    if (newServings < 0) return null;
+
+    const { error: updateError } = await supabase
+      .from("recipes")
+      .update({ servings: newServings })
+      .eq("id", recipeId);
+
+    if (updateError) {
+      return json({ error: updateError }, { status: 500 });
+    }
+
+    const { data: recipeItems } = await supabase
+      .from("recipes")
+      .select("recipes_items(item_id, amount)")
+      .eq("id", recipeId)
+      .single();
+
+    const itemsToAdd = recipeItems?.recipes_items.map((item) => ({
+      item_id: item.item_id,
+      amount: item.amount * newServings,
+      home_id: loggedInHome.home_id,
+      bought: false,
+    }));
+
+    if (itemsToAdd && itemsToAdd.length > 0) {
+      await supabase
+        .from("groceries")
+        .upsert(itemsToAdd)
+        .eq("home_id", loggedInHome.home_id);
+    }
+
+    return null;
+  }
+
   const stepPattern = /^step-\d+$/;
   const ingredientNamePattern = /^ingredient-name-\d+$/;
   const ingredientAmountPattern = /^ingredient-amount-\d+$/;
+  const ingredientWeightPattern = /^ingredient-weight-\d+$/;
 
   const title = formData.get("title");
   const description = formData.get("description");
   const steps: string[] = [];
-  const ingredients: { name: string; amount: number }[] = [];
+  const ingredients: { name: string; amount: number; weight: string }[] = [];
 
   for (const [key, value] of formData.entries()) {
     if (stepPattern.test(key)) {
@@ -75,6 +113,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
     if (ingredientAmountPattern.test(key)) {
       const index = Number.parseInt(key.split("-")[2], 10) - 1;
       ingredients[index] = { ...ingredients[index], amount: Number(value) };
+    }
+
+    if (ingredientWeightPattern.test(key)) {
+      const index = Number.parseInt(key.split("-")[2], 10) - 1;
+      ingredients[index] = { ...ingredients[index], weight: String(value) };
     }
   }
 
@@ -97,6 +140,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       name: ingredient.name,
       amount: ingredient.amount,
       matchedId: matchedId || null,
+      weight: ingredient.weight,
     };
   });
 
@@ -125,6 +169,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return {
       id: matchedItem?.id || item.matchedId || "",
       amount: item.amount,
+      weight: item.weight,
     };
   });
 
@@ -149,6 +194,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       recipe_id: createdRecipe.id,
       item_id: item.id,
       amount: item.amount,
+      weight: item.weight,
     }))
   );
 
@@ -162,6 +208,8 @@ export async function action({ request, context }: ActionFunctionArgs) {
 export default function RecipesPage() {
   const { error, recipes } = useLoaderData<typeof loader>();
   const [searchResults, setSearchResults] = useState<typeof recipes>(recipes);
+  const submit = useSubmit();
+  const navigation = useNavigation();
 
   if (!recipes) return null;
 
@@ -173,6 +221,10 @@ export default function RecipesPage() {
   };
 
   const fuse = new Fuse(recipes, options);
+
+  useEffect(() => {
+    setSearchResults(recipes);
+  }, [recipes]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -199,9 +251,50 @@ export default function RecipesPage() {
       </div>
 
       <div className="grid gap-4 2xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
-        {searchResults?.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
-        ))}
+        {searchResults
+          ?.sort((a, b) => a.title.localeCompare(b.title))
+          .map((recipe) => (
+            <div key={recipe.id} className="flex flex-col">
+              <RecipeCard recipe={recipe} />
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="xs"
+                  disabled={navigation.state !== "idle"}
+                  onClick={() =>
+                    submit(
+                      {
+                        recipeId: recipe.id,
+                        servings: recipe.servings,
+                        action: "remove-serving",
+                      },
+                      { method: "post", replace: true }
+                    )
+                  }
+                >
+                  <MinusIcon className="h-4" />
+                </Button>
+                <p>{recipe.servings || 0}</p>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  disabled={navigation.state !== "idle"}
+                  onClick={() =>
+                    submit(
+                      {
+                        recipeId: recipe.id,
+                        servings: recipe.servings,
+                        action: "add-serving",
+                      },
+                      { method: "post" }
+                    )
+                  }
+                >
+                  <PlusIcon className="h-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );

@@ -20,7 +20,9 @@ export async function loader({ params, request, context }: LoaderFunctionArgs) {
 
   const { data: partialRecipe, error: getRecipeError } = await supabase
     .from("recipes")
-    .select("title, description, steps, recipes_items(amount, item_id), items(id, name)")
+    .select(
+      "title, description, steps, recipes_items(amount, item_id, weight), items(id, name)"
+    )
     .eq("id", recipeId)
     .single();
 
@@ -35,6 +37,7 @@ export async function loader({ params, request, context }: LoaderFunctionArgs) {
     ingredients: partialRecipe.recipes_items.map((recipeItem) => ({
       name: partialRecipe.items.find((item) => item.id === recipeItem.item_id)?.name,
       amount: recipeItem.amount,
+      weight: recipeItem.weight,
     })),
   };
 
@@ -70,15 +73,19 @@ export default function RecipePage() {
                 <h3>{recipe.description}</h3>
               </div>
               <div className="mt-4 flex flex-col gap-4">
-                <ul>
+                <ul className="list-disc">
                   {recipe.ingredients.map((ingredient, index) => (
                     <li
                       key={`ingredient-${index + 1}`}
-                      className="flex items-center gap-5"
+                      className="flex items-center gap-2"
                     >
                       <span className="text-muted-foreground text-sm">
                         x{ingredient.amount}
                       </span>
+                      <span className="text-muted-foreground text-sm">
+                        {ingredient.weight}
+                      </span>
+                      <span>-</span>
                       <span>{ingredient.name}</span>
                     </li>
                   ))}

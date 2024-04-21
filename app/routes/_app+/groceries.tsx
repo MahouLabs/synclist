@@ -39,13 +39,14 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   const loggedInHome = await getLoggedInHome(supabase, session.user.id);
   if (!loggedInHome) return redirect("/onboarding");
 
-  const { data } = await supabase
+  const { data: groceriesData } = await supabase
     .from("groceries")
     .select("item_id, amount, bought, items(name)")
-    .eq("home_id", loggedInHome?.home_id);
+    .eq("home_id", loggedInHome?.home_id)
+    .gt("amount", 0);
 
   const groceries: Grocery[] =
-    data?.map((grocery) => ({
+    groceriesData?.map((grocery) => ({
       amount: grocery.amount,
       bought: grocery.bought,
       name: grocery.items?.name || "",
