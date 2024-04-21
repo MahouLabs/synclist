@@ -93,11 +93,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const stepPattern = /^step-\d+$/;
   const ingredientNamePattern = /^ingredient-name-\d+$/;
   const ingredientAmountPattern = /^ingredient-amount-\d+$/;
+  const ingredientWeightPattern = /^ingredient-weight-\d+$/;
 
   const title = formData.get("title");
   const description = formData.get("description");
   const steps: string[] = [];
-  const ingredients: { name: string; amount: number }[] = [];
+  const ingredients: { name: string; amount: number; weight: string }[] = [];
 
   for (const [key, value] of formData.entries()) {
     if (stepPattern.test(key)) {
@@ -112,6 +113,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
     if (ingredientAmountPattern.test(key)) {
       const index = Number.parseInt(key.split("-")[2], 10) - 1;
       ingredients[index] = { ...ingredients[index], amount: Number(value) };
+    }
+
+    if (ingredientWeightPattern.test(key)) {
+      const index = Number.parseInt(key.split("-")[2], 10) - 1;
+      ingredients[index] = { ...ingredients[index], weight: String(value) };
     }
   }
 
@@ -134,6 +140,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       name: ingredient.name,
       amount: ingredient.amount,
       matchedId: matchedId || null,
+      weight: ingredient.weight,
     };
   });
 
@@ -162,6 +169,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return {
       id: matchedItem?.id || item.matchedId || "",
       amount: item.amount,
+      weight: item.weight,
     };
   });
 
@@ -186,6 +194,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       recipe_id: createdRecipe.id,
       item_id: item.id,
       amount: item.amount,
+      weight: item.weight,
     }))
   );
 

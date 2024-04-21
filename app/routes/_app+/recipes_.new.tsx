@@ -103,19 +103,26 @@ function Steps() {
 }
 
 function TitleAndIngredients() {
-  const [ingredients, setIngredients] = useState<{ name: string; amount: number }[]>([]);
+  const [ingredients, setIngredients] = useState<
+    { name: string; amount: number; weight: string }[]
+  >([]);
 
   const addNewIngredient = () => {
-    setIngredients((prev) => [...prev, { name: "", amount: 1 }]);
+    setIngredients((prev) => [...prev, { name: "", amount: 1, weight: "" }]);
   };
 
   const removeIngredient = (index: number) => {
     setIngredients((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleIngredientChange = (index: number, name: string, amount: number) => {
+  const handleIngredientChange = (
+    index: number,
+    name: string,
+    amount: number,
+    weight: string
+  ) => {
     const newIngredients = [...ingredients];
-    newIngredients[index] = { name, amount };
+    newIngredients[index] = { name, amount, weight };
     setIngredients(newIngredients);
   };
 
@@ -135,21 +142,30 @@ function TitleAndIngredients() {
         {ingredients.map((ingredient, index) => (
           <div key={`ingredient-${index + 1}`} className="flex gap-4">
             <Input
-              className="basis-2/3"
+              className="basis-2/4"
               name={`ingredient-name-${index + 1}`}
               placeholder="Ingredient name"
               value={ingredient.name}
               onChange={(e) =>
-                handleIngredientChange(index, e.target.value, ingredient.amount)
+                handleIngredientChange(
+                  index,
+                  e.target.value,
+                  ingredient.amount,
+                  ingredient.weight
+                )
               }
             />
             <Input
-              className="basis-1/3"
+              className="basis-1/4"
               type="number"
               min={1}
-              defaultValue={1}
               name={`ingredient-amount-${index + 1}`}
               placeholder="Amount"
+            />
+            <Input
+              className="basis-1/4"
+              name={`ingredient-weight-${index + 1}`}
+              placeholder="Weight (optional)"
             />
             <Button
               variant="outline"

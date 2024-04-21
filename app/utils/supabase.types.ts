@@ -170,16 +170,19 @@ export type Database = {
           amount: number
           item_id: string
           recipe_id: string
+          weight: string | null
         }
         Insert: {
           amount: number
           item_id: string
           recipe_id: string
+          weight?: string | null
         }
         Update: {
           amount?: number
           item_id?: string
           recipe_id?: string
+          weight?: string | null
         }
         Relationships: [
           {
