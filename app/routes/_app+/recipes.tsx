@@ -242,48 +242,50 @@ export default function RecipesPage() {
       </div>
 
       <div className="grid gap-4 2xl:grid-cols-5 lg:grid-cols-3 md:grid-cols-2 xl:grid-cols-4">
-        {searchResults?.map((recipe) => (
-          <div key={recipe.id} className="flex flex-col">
-            <RecipeCard recipe={recipe} />
-            <div className="mt-2 flex items-center justify-center gap-2">
-              <Button
-                variant="outline"
-                size="xs"
-                disabled={navigation.state !== "idle"}
-                onClick={() =>
-                  submit(
-                    {
-                      recipeId: recipe.id,
-                      servings: recipe.servings,
-                      action: "remove-serving",
-                    },
-                    { method: "post", replace: true }
-                  )
-                }
-              >
-                <MinusIcon className="h-4" />
-              </Button>
-              <p>{recipe.servings || 0}</p>
-              <Button
-                variant="outline"
-                size="xs"
-                disabled={navigation.state !== "idle"}
-                onClick={() =>
-                  submit(
-                    {
-                      recipeId: recipe.id,
-                      servings: recipe.servings,
-                      action: "add-serving",
-                    },
-                    { method: "post" }
-                  )
-                }
-              >
-                <PlusIcon className="h-4" />
-              </Button>
+        {searchResults
+          ?.sort((a, b) => a.title.localeCompare(b.title))
+          .map((recipe) => (
+            <div key={recipe.id} className="flex flex-col">
+              <RecipeCard recipe={recipe} />
+              <div className="mt-2 flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="xs"
+                  disabled={navigation.state !== "idle"}
+                  onClick={() =>
+                    submit(
+                      {
+                        recipeId: recipe.id,
+                        servings: recipe.servings,
+                        action: "remove-serving",
+                      },
+                      { method: "post", replace: true }
+                    )
+                  }
+                >
+                  <MinusIcon className="h-4" />
+                </Button>
+                <p>{recipe.servings || 0}</p>
+                <Button
+                  variant="outline"
+                  size="xs"
+                  disabled={navigation.state !== "idle"}
+                  onClick={() =>
+                    submit(
+                      {
+                        recipeId: recipe.id,
+                        servings: recipe.servings,
+                        action: "add-serving",
+                      },
+                      { method: "post" }
+                    )
+                  }
+                >
+                  <PlusIcon className="h-4" />
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );
