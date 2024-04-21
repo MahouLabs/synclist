@@ -51,10 +51,14 @@ export default function IndexPage() {
             <Link to={user ? "/home" : "/signin"}>{user ? "Go to home" : "Sign in"}</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="https://github.com/mahoulabs/synclist">
+            <a
+              href="https://github.com/mahoulabs/synclist"
+              target="_blank"
+              rel="noreferrer"
+            >
               <Github className="h-4" />
               Star on github
-            </Link>
+            </a>
           </Button>
         </div>
       </div>
