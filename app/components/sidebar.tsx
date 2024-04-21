@@ -1,7 +1,6 @@
 import { cn } from "@/utils/cn";
 import { Link, useLocation } from "@remix-run/react";
-import { Bell, CookingPot, Home, ScrollText, ShoppingCart } from "lucide-react";
-import { Button } from "./ui/button";
+import { CookingPot, Home, ScrollText, ShoppingCart } from "lucide-react";
 
 type SidebarProps = {
   homeName?: string;
@@ -19,10 +18,6 @@ export function Sidebar({ homeName }: SidebarProps) {
             <span className="">SyncList</span>
           </div>
           {/* TODO: add theme switcher here */}
-          <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
-            <Bell className="h-4 w-4" />
-            <span className="sr-only">Toggle notifications</span>
-          </Button>
         </div>
         <div className="flex-1">
           <nav className="grid items-start px-2 font-medium text-sm lg:px-4">
