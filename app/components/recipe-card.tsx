@@ -27,7 +27,7 @@ export function RecipeCard({ recipe, variant = "default" }: RecipeCardProps) {
         <h3>{recipe.title}</h3>
       </CardHeader>
       <CardContent>
-        <p>{recipe.description}</p>
+        <p className="h-[52px] truncate text-muted-foreground">{recipe.description}</p>
       </CardContent>
     </Card>
   );

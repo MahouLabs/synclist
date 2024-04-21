@@ -64,19 +64,10 @@ export function Sidebar({ homeName }: SidebarProps) {
         </div>
         <div className="mt-auto p-4">
           {homeName && (
-            <Link
-              to="/home"
-              prefetch="intent"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                {
-                  "bg-muted text-primary": pathname.includes("/home"),
-                }
-              )}
-            >
+            <p className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
               <Home className="h-4 w-4" />
               {homeName}
-            </Link>
+            </p>
           )}
         </div>
       </div>
