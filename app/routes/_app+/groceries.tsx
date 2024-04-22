@@ -58,7 +58,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     SUPABASE_URL: context.cloudflare.env.SUPABASE_URL,
   };
 
-  return { groceries, env };
+  return { groceries, env, homeId: loggedInHome.home_id };
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
@@ -199,7 +199,7 @@ function GroceryTableRow({ grocery, disabled }: { grocery: Grocery; disabled: bo
 }
 
 export default function GroceriesPage() {
-  const { groceries, env } = useLoaderData<typeof loader>();
+  const { groceries, env, homeId } = useLoaderData<typeof loader>();
   const supabase = createBrowserClient<Database>(env.SUPABASE_URL, env.SUPABASE_KEY);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Grocery[]>(groceries || []);
@@ -216,13 +216,18 @@ export default function GroceriesPage() {
       .channel("groceries")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "groceries" },
+        {
+          event: "*",
+          schema: "public",
+          table: "groceries",
+          filter: `home_id=eq.${homeId}`,
+        },
         () => {
           revalidator.revalidate();
         }
       )
       .subscribe();
-  }, [supabase.channel, revalidator]);
+  }, [supabase.channel, revalidator, homeId]);
 
   useEffect(() => {
     if (searchQuery.length === 0 || !searchQuery) {
