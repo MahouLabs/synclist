@@ -1,5 +1,5 @@
 <picture>
- <source media="(prefers-color-scheme: dark)" srcset="images/logo-white.png">
+ <source media="(prefers-color-scheme: dark)" srcset="images/logo.png">
  <img alt="Show the synclist logo, with a scroll containing text and the word synclist" src="images/logo-black.png">
 </picture>
 
