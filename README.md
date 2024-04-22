@@ -3,9 +3,9 @@
  <img alt="Show the synclist logo, with a scroll containing text and the word synclist" src="images/logo-black.png">
 </picture>
 
----
-
 ⚠️ This project is still a very early work in progress and was made for [Supabase's OSS Hackaton](https://supabase.com/blog/supabase-oss-hackathon) ⚠️
+
+---
 
 SyncList is a meal prep / grocery manager app for households. It helps you keep track of what you can cook for a given period and automatically assembles a grocery list for you.
 
