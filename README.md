@@ -1,48 +1,44 @@
-# Welcome to Remix + Vite!
+<picture>
+ <source media="(prefers-color-scheme: dark)" srcset="images/logo-white.png">
+ <img alt="Show the synclist logo, with a scroll containing text and the word synclist" src="images/logo-black.png">
+</picture>
 
-📖 See the [Remix docs](https://remix.run/docs) and the [Remix Vite docs](https://remix.run/docs/en/main/future/vite) for details on supported features.
+⚠️ This project is still a very early work in progress and was made for [Supabase's OSS Hackaton](https://supabase.com/blog/supabase-oss-hackathon) ⚠️
 
-## Typegen
+SyncList is a meal prep / grocery manager app for households. It helps you keep track of what you can cook for a given period and automatically assembles a grocery list for you.
 
-Generate types for your Cloudflare bindings in `wrangler.toml`:
+You can also add any custom item to your list, which syncs in real time with everyone on that same home, making quick runs to the grocery store much more efficient.
 
-```sh
-npm run typegen
-```
+Feel free to make contributions,
 
-You will need to rerun typegen whenever you make changes to `wrangler.toml`.
+![Landing Page Screenshot](images/landing.png)
 
 ## Development
 
-Run the Vite dev server:
+This project uses the following stack:
+
+- [Remix](https://remix.run/) to run the fullstack app.
+- [Supabase](https://supabase.com/) for authentication, database and realtime functionality.
+- [Bun](https://bun.sh/) as a package manager.
+- [Cloudflare](https://pages.cloudflare.com/) pages for deployment.
+- [BiomeJS](https://biomejs.dev/) for linting and formatting files.
+- [ShadcnUI](https://ui.shadcn.com/) for ui components.
+
+To run locally, clone the project and install dependencies:
 
 ```sh
-npm run dev
+bun install
 ```
 
-To run Wrangler:
+Then, run supabase locally:
 
 ```sh
-npm run build
-npm run start
+bunx supabase start
 ```
 
-## Deployment
-
-> [!WARNING]  
-> Cloudflare does _not_ use `wrangler.toml` to configure deployment bindings.
-> You **MUST** [configure deployment bindings manually in the Cloudflare dashboard][bindings].
-
-First, build your app for production:
+Replace `.dev.vars.example` with `.dev.vars` and fill it with Supabase's variables.
+Finally, start the project:
 
 ```sh
-npm run build
+bun dev
 ```
-
-Then, deploy your app to Cloudflare Pages:
-
-```sh
-npm run deploy
-```
-
-[bindings]: https://developers.cloudflare.com/pages/functions/bindings/
